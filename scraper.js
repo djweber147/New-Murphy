@@ -1,69 +1,84 @@
 // Select Year and Term
 const year = 2019;
 const term = 20; // 10 - Jterm, 20 - Spring, 30 - Summer, 40 - Fall
-
+var url = "https://classes.aws.stthomas.edu/index.htm?year=" + year + "&term=" + term + "&schoolCode=ALL&levelCode=ALL&selectedSubjects=";
 
 // Requires
-var path = require('path');
-var express = require('express');
+const path = require('path');
+const express = require('express');
+const fs = require('fs');
 const rp = require('request-promise');
 const $ = require('cheerio');
 const r = require('request');
 const sqlite3 = require('sqlite3');
 
 // Create Database
-var db  = new sqlite3.Database(path.join(__dirname, 'db', 'newMurphy.sqlite3'), (err) => 
-{
-  if (err)
-  {
-    console.log('Error Opening Database');
-  }
-  else
-  {
-    console.log('Connected to Database');
-    db.run("CREATE TABLE departments (subject TEXT PRIMARY KEY NULL, full_name TEXT NULL)");
-
-    db.run("CREATE TABLE courses (subject TEXT, course_number INTEGER, credits INTEGER, name TEXT, description TEXT)");
-
-    db.run("CREATE TABLE sections (crn INTEGER PRIMARY KEY NULL, subject TEXT NULL, course_number INTEGER NULL, section_number INTEGER NULL, building TEXT NULL, room TEXT NULL, professors TEXT NULL, times TEXT NULL, capacity INTEGER NULL, registered TEXT NULL)");
-
-    db.run("CREATE TABLE people (university_id INTEGER PRIMARY KEY NULL, position TEXT NULL, password TEXT NULL, first_name TEXT NULL, last_name TEXT NULL, registered_courses TEXT NULL)");
-
-    console.log("Created tables")
-  }
+var db;
+var dbpath = path.join(__dirname, 'newMurphy.sqlite3');
+fs.open(dbpath, 'w', function (err, file) {
+    if (err) throw err;
+    console.log('Database Created');
+    createTables();
 });
 
-// Get Subject List
-var url = "https://classes.aws.stthomas.edu/index.htm?year=" + year + "&term=" + term + "&schoolCode=ALL&levelCode=ALL&selectedSubjects=";
-console.log("Getting list of subjects...");
-rp(url).then(function(html) {
-             
-    var subjects = new Array();
-    var subjectList = $('select#displaySubjectCode > option', html);
-    var tmpSubject;
-             
-    // Loop starts at 1 to avoid "All Subject" option
-    for (var i=1; i < subjectList.length; i++) {
-        tmpSubject = subjectList[i].children[0].data.split(": ");
-        subjects.push(tmpSubject[0]);
+// Create Tables
+function createTables() {
+    db  = new sqlite3.Database(dbpath, (err) =>
+    {
+      if (err)
+      {
+        console.log("Error Opening Database: " + err);
+      }
+      else
+      {
+        console.log('Connected to Database');
+        db.run("CREATE TABLE departments (subject TEXT PRIMARY KEY NULL, full_name TEXT NULL)");
 
-        // Add to data base
-        addSubject(tmpSubject[0], tmpSubject[1]);
-    }
-          
-    // Once Subject list is complete, move to scraping each subject course list
-    console.log("Subject list complete");
-    scrapeSubjects(subjects);
+        db.run("CREATE TABLE courses (subject TEXT, course_number INTEGER, credits INTEGER, name TEXT, description TEXT)");
+
+        db.run("CREATE TABLE sections (crn INTEGER PRIMARY KEY NULL, subject TEXT NULL, course_number INTEGER NULL, section_number INTEGER NULL, building TEXT NULL, room TEXT NULL, professors TEXT NULL, times TEXT NULL, capacity INTEGER NULL, registered TEXT NULL)");
+
+        db.run("CREATE TABLE people (university_id INTEGER PRIMARY KEY NULL, position TEXT NULL, password TEXT NULL, first_name TEXT NULL, last_name TEXT NULL, registered_courses TEXT NULL)");
+
+        console.log("Created tables");
+                                   
+        scrapeSubjectList();
+      }
+    });
+}
+
+function scrapeSubjectList() {
+    // Get Subject List
     
-    // Debug - Print Subject
-    //for (var i = 0; i < subjects.length; i++) {
-    //    console.log(subjects[i]);
-    //}
-             
-}).catch(function(err) {
-    console.log("Cannot find subjects: " + err);
-});
+    console.log("Getting list of subjects...");
+    rp(url).then(function(html) {
+                 
+        var subjects = new Array();
+        var subjectList = $('select#displaySubjectCode > option', html);
+        var tmpSubject;
+                 
+        // Loop starts at 1 to avoid "All Subject" option
+        for (var i=1; i < subjectList.length; i++) {
+            tmpSubject = subjectList[i].children[0].data.split(": ");
+            subjects.push(tmpSubject[0]);
 
+            // Add to data base
+            addSubject(tmpSubject[0], tmpSubject[1]);
+        }
+              
+        // Once Subject list is complete, move to scraping each subject course list
+        console.log("Subject list complete");
+        scrapeSubjects(subjects);
+        
+        // Debug - Print Subject
+        //for (var i = 0; i < subjects.length; i++) {
+        //    console.log(subjects[i]);
+        //}
+                 
+    }).catch(function(err) {
+        console.log("Cannot find subjects: " + err);
+    });
+}
 
 // Scrape each subject
 function scrapeSubjects(subjects) {

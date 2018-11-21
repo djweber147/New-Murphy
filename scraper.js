@@ -149,7 +149,7 @@ function addSubject(subject, full_name) {
 }
 
 function addCourse(subject, course_number, credits, name, description) {
-    //console.log("ADDED COURSE: " + subject + course_number + ": " + name + " " + credits + " credits. ");//+ description);
+    console.log("ADDED COURSE: " + subject + course_number + ": " + name + " " + credits + " credits. ");//+ description);
     db.run("INSERT INTO courses (subject, course_number, credits, name, description) VALUES (? , ?, ?, ? ,?)", subject, course_number, credits, name, description);
 }
 

@@ -34,9 +34,9 @@ function createTables() {
         console.log('Connected to Database');
         db.run("CREATE TABLE departments (subject TEXT PRIMARY KEY NULL, full_name TEXT NULL)");
 
-        db.run("CREATE TABLE courses (subject TEXT, course_number INTEGER, credits INTEGER, name TEXT, description TEXT)");
+        db.run("CREATE TABLE courses (subject TEXT, course_number TEXT, credits INTEGER, name TEXT, description TEXT)");
 
-        db.run("CREATE TABLE sections (crn INTEGER PRIMARY KEY NULL, subject TEXT NULL, course_number INTEGER NULL, section_number INTEGER NULL, building TEXT NULL, room TEXT NULL, professors TEXT NULL, times TEXT NULL, capacity INTEGER NULL, registered TEXT NULL)");
+        db.run("CREATE TABLE sections (crn INTEGER PRIMARY KEY NULL, subject TEXT NULL, course_number TEXT NULL, section_number TEXT NULL, building TEXT NULL, room TEXT NULL, professors TEXT NULL, times TEXT NULL, capacity INTEGER NULL, registered TEXT NULL)");
 
         db.run("CREATE TABLE people (university_id INTEGER PRIMARY KEY NULL, position TEXT NULL, password TEXT NULL, first_name TEXT NULL, last_name TEXT NULL, registered_courses TEXT NULL)");
 
@@ -149,13 +149,18 @@ function addSubject(subject, full_name) {
 }
 
 function addCourse(subject, course_number, credits, name, description) {
-    console.log("ADDED COURSE: " + subject + course_number + ": " + name + " " + credits + " credits. ");//+ description);
+    //console.log("ADDED COURSE: " + subject + course_number + ": " + name + " " + credits + " credits. ");//+ description);
     db.run("INSERT INTO courses (subject, course_number, credits, name, description) VALUES (? , ?, ?, ? ,?)", subject, course_number, credits, name, description);
 }
 
 function addSection(crn, subject, course_number, section_number, building, room, professors, times, capacity) {
-    console.log("ADDED SECTION: " + crn + "-" + subject + course_number + "-" + section_number + ": " + building + room + " " + professors + " " + times + " " + capacity);
-    // In addition to parameters, add "registered" field
     registered = "--";
-    db.run("INSERT INTO sections (crn, subject, course_number, section_number, building, room, professors, times, capacity, registered) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", crn, subject, course_number, section_number, building, room, professors, times, capacity, registered)
+    
+    if (building === "Online" || building === "TBD") {
+        room = "NULL";
+    }
+    
+    console.log("ADDED SECTION: " + crn + "-" + subject + course_number + "-" + section_number + ": " + building + room + " " + professors + " " + times + " " + capacity);
+    
+    db.run("INSERT INTO sections (crn, subject, course_number, section_number, building, room, professors, times, capacity, registered) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", crn, subject, course_number, section_number, building, room, professors, times, capacity, registered);
 }

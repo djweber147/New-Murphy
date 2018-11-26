@@ -1,0 +1,36 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="index.css"/>
+		<link rel="stylesheet" href="css/normalize.css"/>
+		<link rel="stylesheet" href="css/skeleton.css"/>
+		<script type="application/javascript" src="https://cdn.jsdelivr.net/npm/vue"></script>
+		<script type="text/javascript" src="index.js"></script>
+	</head>
+	<body>
+		<div id="header" class="twelve columns"><center><img src="murphy.jpg" alt="Welcome to Murphy Online!!"></center></div>
+		<div id="login" class="row">
+		<div id="header" class="twelve columns"> </center></div>
+			<div class="six columns">
+			<label for="username">USERNAME (University_ID)</label>
+			<input class="u-full-width" type="text" placeholder="username" id="username">
+			</div>
+			<div class="six columns">
+			<label for="password">PASSWORD</label>
+			<input class="u-full-width" type="password" placeholder="******" id="password">
+			</div>
+			<div class="six columns">
+			<label for="postiton">POSITION</label>
+			<select class="u-full-width" id="postiton">
+			<option value="STUDENT">STUDENT</option>
+			<option value="FACULTY">FACULTY</option>
+			</select>
+			</div>
+			<div class="six columns">
+			<button class="button-primary" onclick="logIn()">Log In</button>
+			<button class="button" onclick="newUser()">Create New User</button>
+			</div>
+			
+		</div>
+</html>

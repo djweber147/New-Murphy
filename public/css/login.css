@@ -1,0 +1,9 @@
+#login{
+    padding-left: 380px;
+}
+#header{
+	color: #b91be5;
+}
+#fname, #fnamelabel, #lname, #lnamelabel, #positionlabel, #position {
+    display: none;
+}

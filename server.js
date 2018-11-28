@@ -95,23 +95,19 @@ app.post('/newuser', function(req, res) {
 app.post('/searchdept', function(req, res) {
 	console.log("SEARCH-DEPT");
 	var data = '';
-	db.each("SELECT * FROM departments;",function(err,row){
+	db.all("SELECT * FROM departments;",function(err,rows){
 		if(err) {
 			console.log(err);
 		}
 		else{
-			if (row !== undefined)
-			{
-				console.log(row);
-				res.end(row.subject); 
-			}
+			res.end(JSON.stringify(rows));
 		}
 	});  	
 });
 
 // Start Server
-app.listen(8905, function() {
-    console.log("Started on PORT 8905");
+app.listen(8005, function() {
+    console.log("Started on PORT 8005");
 });
 
 

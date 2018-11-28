@@ -64,11 +64,28 @@ app.post('/newuser', function(req, res) {
      var lname = req.body.lname;
      
      // Could use more error checking along the way (values can't be '')
-     db.run("INSERT INTO people VALUES (?,?,?,?,?,NULL);", username, position, password, fname, lname, function(err) {
-         if(err) {
-            console.log(err);
-         }
-     });
+	 if (isNaN(username) || password === '' || fname === '' || lname === ''){
+		 res.end("err"); // Invalid field
+	 }
+	 else {
+		 db.get("SELECT university_id FROM people WHERE university_id = ?;",username,function(err,row){
+			if(err) {
+				console.log(err);
+			}
+			else{
+				if(row === undefined){ // If there does not exist a university_id with this number...
+					db.run("INSERT INTO people VALUES (?,?,?,?,?,NULL);", username, position, password, fname, lname, function(err) {
+						 if(err) {
+							console.log(err);
+						 }
+					 });
+				}
+				else {
+					res.end("err2"); // University_id already exists
+				}
+			}
+		 }
+	 }
          
      // Check Login and send back "done"
      res.end("done");

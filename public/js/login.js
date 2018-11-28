@@ -18,6 +18,7 @@ function showLogIn() {
     $('#lnamelabel').css('display', 'none');
     $('#positionlabel').css('display', 'none');
     $('#position').css('display', 'none');
+	$('#errormessage').css('display', 'none');
     $('#submit').attr('class', 'button-primary');
     $('#newuser').attr('class', '');
 }
@@ -30,9 +31,19 @@ $(document).ready(function() {
              var username = $("#username").val();
              var password = md5($("#password").val());
              $.post("login", {username: username,password: password}, function(data) {
+				 console.log(data);
+				 console.log($('#errormessage').text());
                  if (data === 'done') {
                      window.location.replace("search.html");
                  }
+				 else if (data === "err") {
+					 showLogIn();
+					 $('#errormessage').text("Incorrect Password. Please Try Again.");
+				 }
+				 else if (data === "err2") {
+					 showLogIn();
+					 $('#errormessage').text("This University ID has not been registered. Please create a new user.");
+				 }
              });
          }
          else {

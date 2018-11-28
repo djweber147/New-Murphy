@@ -18,7 +18,6 @@ function showLogIn() {
     $('#lnamelabel').css('display', 'none');
     $('#positionlabel').css('display', 'none');
     $('#position').css('display', 'none');
-	$('#errormessage').css('display', 'none');
     $('#submit').attr('class', 'button-primary');
     $('#newuser').attr('class', '');
 }

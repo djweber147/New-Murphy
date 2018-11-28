@@ -6,12 +6,11 @@ $(document).ready(function() {
 	if (deptLoaded === false)
 	{
 		$.post("searchdept",function(data){
-			var a = [];
-			console.log(data);
-			$.each(data, function( key, valu){
-				a.push( "<input type='checkbox' id='" + key + "'>" + val + "</input>");
-			});
+			var result = JSON.parse(data);
+			for(var i = 0; i < result.length; i++){
+			var a = "<input type='checkbox' id='" + result[i].subject + "'>" + result[i].subject + "</input>";
 			$("#department2").append(a);
+			}
 		});
 		deptLoaded = true;
 	}

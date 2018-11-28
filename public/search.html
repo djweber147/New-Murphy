@@ -1,0 +1,38 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="css/search.css"/>
+        <link rel="stylesheet" href="css/normalize.css"/>
+        <link rel="stylesheet" href="css/skeleton.css"/>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script type="text/javascript" src="js/search.js"></script>
+    </head>
+    <body>
+        <div class="row">
+            <div id="header" class="twelve columns">
+                <center><img src="img/murphy.jpg" alt="Welcome to Murphy Online!!"></center>
+            </div>
+        </div>
+        <div class="row">
+            <div class="six columns offset-by-three">
+                <label id="positionlabel" for="departments">DEPARTMENTS</label>
+                <select class="u-full-width" id="departments" multiple>
+                    <option value="STUDENT">STUDENT</option>
+                    <option value="FACULTY">FACULTY</option>
+                </select>
+				<div id="departments2"></div>
+				
+                <label id="coursenumberlabel" for="coursenumber">COURSE NUMBER</label>
+                <input class="u-full-width" type="text" placeholder="e.g. CISC 131" id="coursenumber">
+                    
+                <label id="crnlabel" for="crn">CRN</label>
+                <input class="u-full-width" type="number" placeholder="213423" id="crn">
+                
+                <button type="button" id="submit" class="button-primary">Search</button>
+                
+				<label id="errormessage" style="color: red" value=""></label>
+            </div>
+        </div>
+    </body>
+</html>

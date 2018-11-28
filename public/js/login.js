@@ -63,9 +63,17 @@ $(document).ready(function() {
             var lname = $("#lname").val();
             var position = $("#position").val();
             $.post("newuser", {username: username,password: password,fname: fname,lname: lname,position: position}, function(data) {
-                if (data === 'done') {
-                    window.location.replace("search.html");
-                }
+				if (data === 'done') {
+					window.location.replace("search.html");
+				}
+				else if (data === "err") {
+					showNewUser();
+					$('#errormessage').text("INVALID or Missing field.");
+				}
+				else if (data === "err2") {
+					showNewUser();
+					$('#errormessage').text("This University ID has already been registered. Please use a different University ID.");
+				}
             });
         }
         else {

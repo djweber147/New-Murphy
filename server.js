@@ -78,20 +78,36 @@ app.post('/newuser', function(req, res) {
 						 if(err) {
 							console.log(err);
 						 }
+						 else{
+							 res.end("done");
+						 }
 					 });
 				}
 				else {
 					res.end("err2"); // University_id already exists
 				}
 			}
-		 }
+		 });
 	 }
-         
-     // Check Login and send back "done"
-     res.end("done");
+});
+
+// Process departments
+app.get('/searchdept', function(req, res) {
+	console.log("SEARCh-DEPT");
+	db.get("SELECT * FROM departments;",username,function(err,row){
+		if(err) {
+			console.log(err);
+		}
+		else{
+			res.end(row); 
+	 
+		}
+	});   
 });
 
 // Start Server
-app.listen(8005, function() {
-    console.log("Started on PORT 8005");
+app.listen(8905, function() {
+    console.log("Started on PORT 8905");
 });
+
+

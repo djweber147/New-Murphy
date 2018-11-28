@@ -92,17 +92,21 @@ app.post('/newuser', function(req, res) {
 });
 
 // Process departments
-app.get('/searchdept', function(req, res) {
-	console.log("SEARCh-DEPT");
-	db.get("SELECT * FROM departments;",username,function(err,row){
+app.post('/searchdept', function(req, res) {
+	console.log("SEARCH-DEPT");
+	var data = '';
+	db.each("SELECT * FROM departments;",function(err,row){
 		if(err) {
 			console.log(err);
 		}
 		else{
-			res.end(row); 
-	 
+			if (row !== undefined)
+			{
+				console.log(row);
+				res.end(row.subject); 
+			}
 		}
-	});   
+	});  	
 });
 
 // Start Server

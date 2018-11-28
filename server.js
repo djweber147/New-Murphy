@@ -29,11 +29,30 @@ app.get('/', function(req,res) {
 
 // Process Login
 app.post('/login', function(req, res) {
-    var username = req.body.username;
+    var username = req.body.username; // University ID
     var password = req.body.password;
     console.log("User name = " + username + ", password is " + password);
-    // Check Login and send back "done"
-    res.end("done");
+	var go = false;
+	db.get("SELECT password FROM people WHERE university_id = ?;",username,function(err,row){
+		if(err){
+			console.log(err);
+			res.end("err2"); 
+		}
+		else{
+			console.log(row);
+			if(row !== undefined){
+				if(row.password === password){
+					res.end("done"); // Sucsess
+				}
+				else{
+					res.end("err"); // Problem
+				}
+			}
+			else{
+				res.end("err2"); // If university_id does not exist, return err2
+			}
+		}
+	});
 });
 
 // Process New User

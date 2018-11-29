@@ -15,22 +15,23 @@ $(document).ready(function() {
 		deptLoaded = true;
 	}
      $("#submit").click(function() {
-		 var username = $("#username").val();
-		 var password = md5($("#password").val());
-		 $.post("login", {username: username,password: password}, function(data) {
-			 console.log(data);
-			 console.log($('#errormessage').text());
-			 if (data === 'done') {
-				 window.location.replace("search.html");
-			 }
-			 else if (data === "err") {
-				 showLogIn();
-				 $('#errormessage').text("Incorrect Password. Please Try Again.");
-			 }
-			 else if (data === "err2") {
-				 showLogIn();
-				 $('#errormessage').text("This University ID has not been registered. Please create a new user.");
-			 }
-		 });
+         var crn = $("#crn").val();
+         var coursenumber = $("#coursenumber").val();
+         var departments = $("#departments").val();
+        $.post("courses", {crn: crn,coursenumber: coursenumber,departments: departments}, function(data) {
+             console.log(data);
+//             console.log($('#errormessage').text());
+//             if (data === 'done') {
+//				 window.location.replace("search.html");
+//             }
+//             else if (data === "err") {
+//                 showLogIn();
+//                 $('#errormessage').text("Incorrect Password. Please Try Again.");
+//             }
+//             else if (data === "err2") {
+//                 showLogIn();
+//                 $('#errormessage').text("This University ID has not been registered. Please create a new user.");
+//             }
+         });
      });
 });

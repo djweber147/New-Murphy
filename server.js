@@ -1,5 +1,5 @@
 // Imports
-var sqlite3 = require('sqlite3');
+var sqlite3 = require('sqlite3').verbose();
 var path = require('path');
 var express = require('express');
 var bodyParser = require('body-parser');
@@ -92,7 +92,7 @@ app.post('/newuser', function(req, res) {
 });
 
 // Process departments
-app.post('/searchdept', function(req, res) {
+app.get('/searchdept', function(req, res) {
 	console.log("SEARCH-DEPT");
 	var data = '';
 	db.all("SELECT * FROM departments;",function(err,rows){
@@ -103,6 +103,61 @@ app.post('/searchdept', function(req, res) {
 			res.end(JSON.stringify(rows));
 		}
 	});  	
+});
+
+// Process courses
+app.post('/courses', function(req, res) {
+    
+    // Get Post parameters
+    var crn = req.body.crn;
+    var coursenumber = req.body.coursenumber;
+    var departments = req.body.departments;
+    var stmt;
+
+    // Departments or CRN is required
+    if (departments === undefined && crn == "") {
+         res.end("err");
+    }
+    else {
+         
+        // Prepare statement (susceptible to sql injection)
+        if (departments !== undefined) {
+            departments = departments.toString().replace(/,/g, " OR departments = ");
+         }
+     
+        stmt = "SELECT * FROM sections WHERE";
+     
+        // If CRN is provided
+        if (crn !== "") {
+            stmt += " crn = ";
+            stmt += crn;
+            stmt += ";";
+        }
+        else if (coursenumber !== "") {
+             stmt += " course_number = ";
+             stmt += coursenumber;
+             stmt += " AND (subject = \"";
+             stmt += departments;
+             stmt += "\");";
+        }
+        else {
+             stmt += " (subject = \"";
+             stmt += departments;
+             stmt += "\");";
+        }
+
+        console.log(stmt);
+    }
+         
+    db.all(stmt, function(err, rows) {
+        if (err) {
+            res.end("err");
+            console.log(err);
+        }
+        else {
+            res.end(JSON.stringify(rows));;
+        }
+    });
 });
 
 // Start Server

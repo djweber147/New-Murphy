@@ -5,38 +5,60 @@
         <link rel="stylesheet" href="css/search.css"/>
         <link rel="stylesheet" href="css/normalize.css"/>
         <link rel="stylesheet" href="css/skeleton.css"/>
-        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-        <script type="text/javascript" src="js/search.js"></script>
+        <script type="application/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script type="application/javascript" src="https://cdn.jsdelivr.net/npm/vue"></script>
     </head>
     <body>
         <div class="row">
-            <div id="header" class="twelve columns">
+            <div class="twelve columns">
                 <center><img src="img/murphy.jpg" alt="Welcome to Murphy Online!!"></center>
             </div>
         </div>
         <div class="row">
-            <div class="six columns offset-by-three">
-                <label id="positionlabel" for="departments2">DEPARTMENTS</label>
-               	<div id="departments2"></div>
-				
-                <label id="coursenumberlabel" for="coursenumber">COURSE NUMBER</label>
-                <input class="u-full-width" type="text" placeholder="e.g. 131" id="coursenumber">
-                    
-                <label id="crnlabel" for="crn">CRN</label>
-                <input class="u-full-width" type="number" placeholder="213423" id="crn">
-                
-                <button type="button" id="submit" class="button-primary">Search</button>
-                
-				<label id="errormessage" style="color: red" value=""></label>
-				<table id="results" style="hidden: true">
-					<th>
-						<td>Subject</td>
-						<td>Course/Section Number</td>
-						<td>Building/Room</td>
-						<td>CRN</td>
-					</th>
-				</table>
+            <div id="header" class="twelve columns">
+                <center><h2>Course Search</h2></center>
             </div>
         </div>
+        <div id="app" class="row">
+            <div class="eight columns offset-by-two">
+                <label for="departments">DEPARTMENTS</label>
+                <select class="u-full-width" id="departments" v-model="req_departments" multiple>
+                    <option v-bind:value="dept.subject" v-for="dept in departments" >{{ dept.subject }}</option>
+                </select>
+                <label id="coursenumberlabel" for="coursenumber">COURSE NUMBER</label>
+                <input class="u-full-width" type="text" placeholder="e.g. 131" id="coursenumber" v-model="req_coursenumber">
+                    
+                <label id="crnlabel" for="crn">CRN</label>
+                <input class="u-full-width" type="number" placeholder="213423" id="crn" v-model="req_crn">
+                
+                <button type="button" v-on:click="app.getCourses()" class="button-primary">Search</button>
+                
+				<label id="errormessage" style="color: red" value=""></label>
+                <table>
+                    <tr>
+                        <th>CRN</th>
+                        <th>Course Number</th>
+                        <th>Location</th>
+                        <th>Professor</th>
+                        <th>Time</th>
+                        <th>Capacity</th>
+                    </tr>
+                    <tr v-for="course in courses">
+                        <td>{{ course.crn }}</td>
+                        <td>{{ course.subject }} {{ course.course_number }}-{{ course.section_number }}</td>
+                        <td>{{ course.building }} {{ course.room }} </td>
+                        <td>{{ course.professors }}</td>
+                        <td>{{ course.times }}</td>
+                        <td>{{ course.capacity }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" v-if="courses==''">
+                            <i>No Courses Available</i>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <script type="text/javascript" src="js/search.js"></script>
     </body>
 </html>

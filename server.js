@@ -1,6 +1,7 @@
 // Imports
 var sqlite3 = require('sqlite3').verbose();
 var path = require('path');
+var url = require('url');
 var express = require('express');
 var bodyParser = require('body-parser');
 var app = express();
@@ -92,10 +93,10 @@ app.post('/newuser', function(req, res) {
 });
 
 // Process departments
-app.post('/searchdept', function(req, res) {
+app.get('/searchdept', function(req, res) {
 	console.log("SEARCH-DEPT");
 	var data = '';
-	db.all("SELECT * FROM departments;",function(err,rows){
+	db.all("SELECT * FROM departments ORDER BY full_name;",function(err,rows){
 		if(err) {
 			console.log(err);
 		}
@@ -106,12 +107,14 @@ app.post('/searchdept', function(req, res) {
 });
 
 // Process courses
-app.post('/courses', function(req, res) {
+app.get('/courses', function(req, res) {
     
-    // Get Post parameters
-    var crn = req.body.crn;
-    var coursenumber = req.body.coursenumber;
-    var departments = req.body.departments;
+    // Get GET parameters
+    var query = url.parse(req.url, true).query;
+
+    var crn = query.crn;
+    var coursenumber = query.coursenumber;
+    var departments = query.departments;
     var stmt;
 
     // Departments or CRN is required
@@ -121,39 +124,29 @@ app.post('/courses', function(req, res) {
     else {
          
         // Prepare statement (susceptible to sql injection)
-        //if (departments !== undefined) {
-        //    departments = departments.toString().replace(/,/g, " OR departments = ");
-        // }
-		if (departments !== undefined){
-			var sendData = "";
-			for(var i = 0; i < departments.length; i++){
-				sendData += "subject = \""+ departments[i] +"\"";
-				if (i<departments.length-1){
-					sendData += " OR ";
-				}
-			}
-			departments = sendData;
-		}
+        if (departments !== undefined) {
+            departments = departments.toString().replace(/,/g, "\" OR subject = \"");
+         }
      
         stmt = "SELECT * FROM sections WHERE";
      
         // If CRN is provided
-        if (crn !== "") {
+        if (crn != "") {
             stmt += " crn = ";
             stmt += crn;
             stmt += ";";
         }
-        else if (coursenumber !== "") {
+        else if (coursenumber.trim() != "") {
              stmt += " course_number = ";
              stmt += coursenumber;
-             stmt += " AND (";//subject = \"";
+             stmt += " AND (subject = \"";
              stmt += departments;
-             stmt += ");";
+             stmt += "\");";
         }
         else {
-             stmt += " (";//subject = \"";
+             stmt += " (subject = \"";
              stmt += departments;
-             stmt += ");";
+             stmt += "\");";
         }
 
         console.log(stmt);

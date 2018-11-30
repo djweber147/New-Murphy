@@ -92,7 +92,7 @@ app.post('/newuser', function(req, res) {
 });
 
 // Process departments
-app.get('/searchdept', function(req, res) {
+app.post('/searchdept', function(req, res) {
 	console.log("SEARCH-DEPT");
 	var data = '';
 	db.all("SELECT * FROM departments;",function(err,rows){
@@ -121,9 +121,19 @@ app.post('/courses', function(req, res) {
     else {
          
         // Prepare statement (susceptible to sql injection)
-        if (departments !== undefined) {
-            departments = departments.toString().replace(/,/g, " OR departments = ");
-         }
+        //if (departments !== undefined) {
+        //    departments = departments.toString().replace(/,/g, " OR departments = ");
+        // }
+		if (departments !== undefined){
+			var sendData = "";
+			for(var i = 0; i < departments.length; i++){
+				sendData += "subject = \""+ departments[i] +"\"";
+				if (i<departments.length-1){
+					sendData += " OR ";
+				}
+			}
+			departments = sendData;
+		}
      
         stmt = "SELECT * FROM sections WHERE";
      
@@ -136,14 +146,14 @@ app.post('/courses', function(req, res) {
         else if (coursenumber !== "") {
              stmt += " course_number = ";
              stmt += coursenumber;
-             stmt += " AND (subject = \"";
+             stmt += " AND (";//subject = \"";
              stmt += departments;
-             stmt += "\");";
+             stmt += ");";
         }
         else {
-             stmt += " (subject = \"";
+             stmt += " (";//subject = \"";
              stmt += departments;
-             stmt += "\");";
+             stmt += ");";
         }
 
         console.log(stmt);

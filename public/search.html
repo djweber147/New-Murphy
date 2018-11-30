@@ -16,13 +16,8 @@
         </div>
         <div class="row">
             <div class="six columns offset-by-three">
-                <label id="positionlabel" for="departments">DEPARTMENTS</label>
-                <select class="u-full-width" id="departments" multiple>
-                    <option value="CATH">CATH</option>
-                    <option value="PHIL">PHIL</option>
-                    <option value="CISC">CISC</option>
-                </select>
-				<div id="departments2"></div>
+                <label id="positionlabel" for="departments2">DEPARTMENTS</label>
+               	<div id="departments2"></div>
 				
                 <label id="coursenumberlabel" for="coursenumber">COURSE NUMBER</label>
                 <input class="u-full-width" type="text" placeholder="e.g. 131" id="coursenumber">
@@ -33,6 +28,14 @@
                 <button type="button" id="submit" class="button-primary">Search</button>
                 
 				<label id="errormessage" style="color: red" value=""></label>
+				<table id="results" style="hidden: true">
+					<th>
+						<td>Subject</td>
+						<td>Course/Section Number</td>
+						<td>Building/Room</td>
+						<td>CRN</td>
+					</th>
+				</table>
             </div>
         </div>
     </body>

@@ -5,12 +5,14 @@ var app = new Vue({
         req_crn: '',
         req_departments: [],
         departments: [],
-        courses: []
+        courses: [],
+	loaded: false
     },
     methods: {
         getDepartments: function() {
             $.getJSON("searchdept",function(data) {
                 app.departments = data;
+		app.loaded = true;
             });
         },
         getCourses: function() {

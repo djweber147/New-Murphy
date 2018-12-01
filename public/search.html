@@ -22,9 +22,13 @@
         <div id="app" class="row">
             <div class="eight columns offset-by-two">
                 <label for="departments">DEPARTMENTS</label>
-                <select class="u-full-width" id="departments" v-model="req_departments" multiple>
-                    <option v-bind:value="dept.subject" v-for="dept in departments" >{{ dept.subject }}</option>
-                </select>
+                <!--<select class="u-full-width" id="departments" v-model="req_departments" style="height:100px" multiple>
+                    <option v-bind:value="dept.subject" v-for="dept in departments" >{{ dept.full_name }}</option>
+                </select>-->
+		<div v-if="loaded === true">
+		<div v-for="dept in departments">
+			<input type="checkbox" id="departments" v-bind:value="dept.subject" v-model="req_departments">{{ dept.full_name }} 	{{ dept.subject }}</input>		
+		</div></div>
                 <label id="coursenumberlabel" for="coursenumber">COURSE NUMBER</label>
                 <input class="u-full-width" type="text" placeholder="e.g. 131" id="coursenumber" v-model="req_coursenumber">
                     

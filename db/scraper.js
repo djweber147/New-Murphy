@@ -36,9 +36,9 @@ function createTables() {
 
         db.run("CREATE TABLE courses (subject TEXT, course_number TEXT, credits INTEGER, name TEXT, description TEXT)");
 
-        db.run("CREATE TABLE sections (crn INTEGER PRIMARY KEY NULL, subject TEXT NULL, course_number TEXT NULL, section_number TEXT NULL, building TEXT NULL, room TEXT NULL, professors TEXT NULL, times TEXT NULL, capacity INTEGER NULL, registered TEXT NULL)");
+        db.run("CREATE TABLE sections (crn INTEGER PRIMARY KEY NULL, subject TEXT NULL, course_number TEXT NULL, section_number TEXT NULL, building TEXT NULL, room TEXT NULL, professors TEXT NULL, times TEXT NULL, capacity INTEGER NULL, registered TEXT NULL,  waitlist TEXT NULL)");
 
-        db.run("CREATE TABLE people (university_id INTEGER PRIMARY KEY NULL, position TEXT NULL, password TEXT NULL, first_name TEXT NULL, last_name TEXT NULL, registered_courses TEXT NULL)");
+        db.run("CREATE TABLE people (university_id INTEGER PRIMARY KEY NULL, position TEXT NULL, password TEXT NULL, first_name TEXT NULL, last_name TEXT NULL, registered_courses TEXT NULL, wishlist TEXT NULL)");
 
         console.log("Created tables");
                                    
@@ -162,5 +162,5 @@ function addSection(crn, subject, course_number, section_number, building, room,
     
     console.log("ADDED SECTION: " + crn + "-" + subject + course_number + "-" + section_number + ": " + building + room + " " + professors + " " + times + " " + capacity);
     
-    db.run("INSERT INTO sections (crn, subject, course_number, section_number, building, room, professors, times, capacity, registered) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", crn, subject, course_number, section_number, building, room, professors, times, capacity, registered);
+    db.run("INSERT INTO sections (crn, subject, course_number, section_number, building, room, professors, times, capacity, registered, waitlist) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,NULL)", crn, subject, course_number, section_number, building, room, professors, times, capacity, registered);
 }

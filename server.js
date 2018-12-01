@@ -75,7 +75,7 @@ app.post('/newuser', function(req, res) {
 			}
 			else{
 				if(row === undefined){ // If there does not exist a university_id with this number...
-					db.run("INSERT INTO people VALUES (?,?,?,?,?,NULL);", username, position, password, fname, lname, function(err) {
+					db.run("INSERT INTO people VALUES (?,?,?,?,?,NULL,NULL);", username, position, password, fname, lname, function(err) {
 						 if(err) {
 							console.log(err);
 						 }

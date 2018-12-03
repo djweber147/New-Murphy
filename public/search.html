@@ -38,22 +38,33 @@
                 <button type="button" v-on:click="app.getCourses()" class="button-primary">Search</button>
                 
 				<label id="errormessage" style="color: red" value=""></label>
-                <table>
+                <table id="classList">
                     <tr>
-                        <th>CRN</th>
+                        <th onclick="row(0)">CRN</th>
                         <th>Course Number</th>
                         <th>Location</th>
                         <th>Professor</th>
                         <th>Time</th>
                         <th>Capacity</th>
                     </tr>
-                    <tr v-for="course in courses">
+                    <tr>
+			<table v-for="course in courses">
+			<tr @click="if (document.getElementById(course.crn).style.display === 'none'){document.getElementById(course.crn).style.display = 'block'}else{document.getElementById(course.crn).style.display = 'none'}">
                         <td>{{ course.crn }}</td>
                         <td>{{ course.subject }} {{ course.course_number }}-{{ course.section_number }}</td>
                         <td>{{ course.building }} {{ course.room }} </td>
                         <td>{{ course.professors }}</td>
                         <td>{{ course.times }}</td>
                         <td>{{ course.capacity }}</td>
+			</tr>
+			<tr v-bind:id="course.crn" style="display: none">
+			<td>{{ course.discription }}</td>
+                        <td>{{ course.subject }} {{ course.course_number }}-{{ course.section_number }}</td>
+                        <td>{{ course.building }} {{ course.room }} </td>
+                        <td>{{ course.professors }}</td>
+                        <td>{{ course.times }}</td>
+                        <td>{{ course.capacity }}</td>
+			</tr></table>
                     </tr>
                     <tr>
                         <td colspan="6" v-if="courses==''">

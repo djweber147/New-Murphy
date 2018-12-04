@@ -33,6 +33,7 @@ $(document).ready(function() {
 				 console.log(data);
 				 console.log($('#errormessage').text());
                  if (data === 'done') {
+					 localStorage.setItem("user", username);
                      window.location.replace("search.html");
                  }
 				 else if (data === "err") {
@@ -63,6 +64,7 @@ $(document).ready(function() {
             var position = $("#position").val();
             $.post("newuser", {username: username,password: password,fname: fname,lname: lname,position: position}, function(data) {
 				if (data === 'done') {
+					localStorage.setItem("user", username);
 					window.location.replace("search.html");
 				}
 				else if (data === "err") {

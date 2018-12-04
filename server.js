@@ -163,6 +163,21 @@ app.get('/courses', function(req, res) {
     });
 });
 
+// Get User Data
+app.get('/userProfile', function(req, res) {
+	var query = url.parse(req.url, true).query;
+    var university_id = query.university_id;
+
+	db.get("SELECT * FROM people WHERE university_id = ?;",university_id,function(err,row){
+		if(err) {
+			console.log(err);
+		}
+		else{
+			res.end(JSON.stringify(row));
+		}
+	});  	
+});
+
 // Start Server
 app.listen(8005, function() {
     console.log("Started on PORT 8005");

@@ -29,6 +29,7 @@ var app = new Vue({
             req = "userProfile?university_id=" + userName;
             $.getJSON(req, function(data) {
                 app.profile = data;
+				console.log(data,"REG");
             });
         },
 		sortRows: function(col){
@@ -39,12 +40,14 @@ var app = new Vue({
 			
 		},
 		checkProfile: function(x){
-			if(app.profile.registed_courses === undefined){
+			if(app.profile.registered_courses === undefined){
 				return false;
 			}
-			var list = app.profile.registed_courses.split(', ');
-			for(var i = 0; i < app.profile.registed_courses.length; i++){
-				if (list[i] === x){
+			var list = app.profile.registered_courses.split(', ');
+			console.log(list);
+			for(var i = 0; i < app.profile.registered_courses.length; i++){
+				console.log(list[i],x);
+				if (list[i] === x.toString()){
 					return true;
 				}
 			}
@@ -52,25 +55,25 @@ var app = new Vue({
 		},
 		registerClass: function(x){
 			var username = app.profile.university_id;
-			$.post("registerClass", {username: username}, function(data) {
-				 console.log(data);
-				 console.log($('#errormessage').text());
+			$.post("registerClass", {username: username, crn: x}, function(data) {
                  if (data === 'done') {
-					 localStorage.setItem("user", username);
-                     window.location.replace("search.html");
+					 app.getUser();
                  }
-				 else if (data === "err") {
-					 showLogIn();
-					 $('#errormessage').text("Incorrect Password. Please Try Again.");
-				 }
-				 else if (data === "err2") {
-					 showLogIn();
-					 $('#errormessage').text("This University ID has not been registered. Please create a new user.");
+				 else {
+					 $('#errormessage').text("ERROR: Register Class");
 				 }
              });
 		},
 		dropClass: function(x){
-			
+			var username = app.profile.university_id;
+			$.post("dropClass", {username: username, crn: x}, function(data) {
+                 if (data === 'done') {
+					 app.getUser();
+                 }
+				 else {
+					 $('#errormessage').text("ERROR: Drop Class");
+				 }
+             });
 		}
 		
     },

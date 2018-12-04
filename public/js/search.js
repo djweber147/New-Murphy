@@ -23,9 +23,10 @@ var app = new Vue({
         getCourses: function() {
             var req = "";
             req = req.concat("courses?crn=", app.req_crn, "&coursenumber= ", app.req_coursenumber, "&departments=", app.req_departments);
+            showLoading();
             $.getJSON(req, function(data) {
                 app.courses = data;
-                
+                hideLoading();
             });
                   
         },

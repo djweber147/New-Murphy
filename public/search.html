@@ -8,7 +8,7 @@
         <script type="application/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
         <script type="application/javascript" src="https://cdn.jsdelivr.net/npm/vue"></script>
     </head>
-    <body>
+    <body v-on:load="app.getUser()">
         <div class="row">
             <div class="twelve columns">
                 <center><img src="img/murphy.jpg" alt="Welcome to Murphy Online!!"></center>
@@ -40,31 +40,23 @@
 				<label id="errormessage" style="color: red" value=""></label>
                 <table id="classList">
                     <tr>
-                        <th onclick="row(0)">CRN</th>
-                        <th>Course Number</th>
-                        <th>Location</th>
-                        <th>Professor</th>
-                        <th>Time</th>
-                        <th>Capacity</th>
+                        <th @click="app.sortRows(0)">CRN</th>
+                        <th @click="app.sortRows(1)">Course Number</th>
+                        <th @click="app.sortRows(2)">Location</th>
+                        <th @click="app.sortRows(3)">Professor</th>
+                        <th @click="app.sortRows(4)">Time</th>
+                        <th @click="app.sortRows(5)">Capacity</th>
+						<th>Register/Drop</th>
                     </tr>
-                    <tr>
-			<table v-for="course in courses">
-			<tr @click="if (document.getElementById(course.crn).style.display === 'none'){document.getElementById(course.crn).style.display = 'block'}else{document.getElementById(course.crn).style.display = 'none'}">
-                        <td>{{ course.crn }}</td>
-                        <td>{{ course.subject }} {{ course.course_number }}-{{ course.section_number }}</td>
-                        <td>{{ course.building }} {{ course.room }} </td>
-                        <td>{{ course.professors }}</td>
-                        <td>{{ course.times }}</td>
-                        <td>{{ course.capacity }}</td>
-			</tr>
-			<tr v-bind:id="course.crn" style="display: none">
-			<td>{{ course.discription }}</td>
-                        <td>{{ course.subject }} {{ course.course_number }}-{{ course.section_number }}</td>
-                        <td>{{ course.building }} {{ course.room }} </td>
-                        <td>{{ course.professors }}</td>
-                        <td>{{ course.times }}</td>
-                        <td>{{ course.capacity }}</td>
-			</tr></table>
+                    <tr v-for="course in courses" @click="app.addRow(event)">
+						<td>{{ course.crn }}</td>
+						<td>{{ course.subject }} {{ course.course_number }}-{{ course.section_number }}</td>
+						<td>{{ course.building }} {{ course.room }} </td>
+						<td>{{ course.professors }}</td>
+						<td>{{ course.times }}</td>
+						<td>{{ course.capacity }}</td>
+						<td v-if="checkProfile(course.crn)"><button @click="dropClass(course.crn)">Drop</button></td>
+						<td v-else><button @click="registerClass(course.crn)">Register</button></td>
                     </tr>
                     <tr>
                         <td colspan="6" v-if="courses==''">

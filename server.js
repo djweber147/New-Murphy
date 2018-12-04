@@ -92,6 +92,75 @@ app.post('/newuser', function(req, res) {
 	 }
 });
 
+// Regester for a class
+app.post('/registerClass', function(req, res) {
+     var username = req.body.username;
+     var crn = req.body.crn;
+	var registered_courses;
+     
+     // Could use more error checking along the way (values can't be '')
+	 if (isNaN(username)){
+		 res.end("err"); // Invalid field
+	 }
+	 else {
+		 db.get("SELECT registered_courses FROM people WHERE university_id = ?;",username,function(err,row){
+			registered_courses = row.registered_courses;
+			if(err) {
+				console.log(err);
+			}
+			else{
+				if(registered_courses !== null){
+					registered_courses = row.registered_courses + ", " + crn;
+				}
+				else{
+					registered_courses = crn;
+				}
+				db.run("UPDATE people SET registered_courses = ? WHERE university_id = ?;", registered_courses, username, function(err) {
+					 if(err) {
+						console.log(err);
+					 }
+					 else{
+						 res.end("done");
+					 }
+				 });
+				}
+		 });
+	 }
+});
+
+// Drop a class
+app.post('/dropClass', function(req, res) {
+    var username = req.body.username;
+    var crn = req.body.crn;
+	var registered_courses;
+     
+     // Could use more error checking along the way (values can't be '')
+	 if (isNaN(username)){
+		 res.end("err"); // Invalid field
+	 }
+	 else {
+		 db.get("SELECT registered_courses FROM people WHERE university_id = ?;",username,function(err,row){
+			registered_courses = row.registered_courses;
+			if(err) {
+				console.log(err);
+			}
+			else{
+				registered_courses = registered_courses.replace(crn+", ","");
+				registered_courses = registered_courses.replace(", "+crn,"");
+				registered_courses = registered_courses.replace(crn,"");
+				db.run("UPDATE people SET registered_courses = ? WHERE university_id = ?;", registered_courses, username, function(err) {
+					 if(err) {
+						console.log(err);
+					 }
+					 else{
+						 res.end("done");
+					 }
+				 });
+				}
+		 });
+	 }
+});
+
 // Process departments
 app.get('/searchdept', function(req, res) {
 	console.log("SEARCH-DEPT");

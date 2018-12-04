@@ -9,6 +9,7 @@
         <script type="application/javascript" src="https://cdn.jsdelivr.net/npm/vue"></script>
     </head>
     <body v-on:load="app.getUser()">
+        <div id="loading"><img src="img/loading.gif" /></div>
         <div class="row">
             <div class="twelve columns">
                 <center><img src="img/murphy.jpg" alt="Welcome to Murphy Online!!"></center>
@@ -25,7 +26,7 @@
                 <!--<select class="u-full-width" id="departments" v-model="req_departments" style="height:100px" multiple>
                     <option v-bind:value="dept.subject" v-for="dept in departments" >{{ dept.full_name }}</option>
                 </select>-->
-		<div v-if="loaded === true">
+		<div id="depts" v-if="loaded === true">
 		<div v-for="dept in departments">
 			<input type="checkbox" id="departments" v-bind:value="dept.subject" v-model="req_departments">{{ dept.full_name }} 	{{ dept.subject }}</input>		
 		</div></div>
@@ -40,15 +41,15 @@
 				<label id="errormessage" style="color: red" value=""></label>
                 <table id="classList">
                     <tr>
-                        <th @click="app.sortRows(0)">CRN</th>
-                        <th @click="app.sortRows(1)">Course Number</th>
-                        <th @click="app.sortRows(2)">Location</th>
-                        <th @click="app.sortRows(3)">Professor</th>
-                        <th @click="app.sortRows(4)">Time</th>
-                        <th @click="app.sortRows(5)">Capacity</th>
+                        <th @click="app.sortRows('crn')">CRN</th>
+                        <th @click="app.sortRows('subject')">Course Number</th>
+                        <th @click="app.sortRows('building')">Location</th>
+                        <th @click="app.sortRows('professors')">Professor</th>
+                        <th @click="app.sortRows('times')">Time</th>
+                        <th @click="app.sortRows('capacity')">Capacity</th>
 						<th>Register/Drop</th>
                     </tr>
-                    <tr v-for="course in courses" @click="app.addRow(event)">
+                    <tr v-for="course in sortedCourses" @click="app.addRow(event)">
 						<td>{{ course.crn }}</td>
 						<td>{{ course.subject }} {{ course.course_number }}-{{ course.section_number }}</td>
 						<td>{{ course.building }} {{ course.room }} </td>

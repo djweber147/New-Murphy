@@ -8,27 +8,29 @@ var app = new Vue({
         courses: [],
 		loaded: false,
 		profile: null,
-        currentSort: 'coursenumber',
+		showSchedule: false,
+		classObjects: [],
+		check: false,
+		currentSort: 'coursenumber',
         currentSortDir: 'desc'
     },
     methods: {
         getDepartments: function() {
-            showLoading();
+			showLoading();
             $.getJSON("searchdept",function(data) {
                 app.departments = data;
 				app.loaded = true;
-                hideLoading();
+				hideLoading();
             });
         },
         getCourses: function() {
             var req = "";
             req = req.concat("courses?crn=", app.req_crn, "&coursenumber= ", app.req_coursenumber, "&departments=", app.req_departments);
             showLoading();
-            $.getJSON(req, function(data) {
+			$.getJSON(req, function(data) {
                 app.courses = data;
-                hideLoading();
+				hideLoading();
             });
-                  
         },
 		getUser: function() {
             var req = "";
@@ -36,10 +38,10 @@ var app = new Vue({
             req = "userProfile?university_id=" + userName;
             $.getJSON(req, function(data) {
                 app.profile = data;
-				console.log(data,"REG");
             });
+			this.getClasses();
         },
-        sortRows: function(s) {
+		sortRows: function(s) {
             //if s == current sort, reverse
             if(s === this.currentSort) {
                 this.currentSortDir = this.currentSortDir==='asc'?'desc':'asc';
@@ -51,27 +53,44 @@ var app = new Vue({
 			
 		},
 		checkProfile: function(x){
-			if(app.profile.registered_courses === null){
-				return false;
+			if (app.check == false){
+				app.getUser();
+				app.check = true;
 			}
-			var list = app.profile.registered_courses.split(', ');
-                  
-            var numcourses;
-            if (app.profile.registered_courses === null) { numcourses = 0; }
-            else if (app.profile.registered_courses.match(/,/g) === null) { numcourses = 1; }
-            else { numcourses = app.profile.registered_courses.match(/,/g).length+1; }
-
-			for(var i = 0; i < numcourses; i++){
-				//console.log(list[i],x);
-				if (list[i] === x.toString()){
-					return true;
+			var color1 = "#a29ca8"; // Gray for unregistered
+			var color2 = "#a362e0"; // light purple for registered
+			var color3 = "#d2f287"; // light yellow for waitlist
+			var color4 = "#f4b942"; // Orange for time conflict
+			
+			$("#"+x.crn).css("background-color",color1); // Set Color
+			
+			if(app.profile.registered_courses == null ){
+				return "REG"; // You are not registered
+			}
+			//var list = app.profile.registered_courses.split(', ');
+			for(var i = 0; i < app.classObjects.length; i++){
+				if (app.classObjects[i].crn === x.crn){
+					$("#"+x.crn).css("background-color",color2);
+					return "DROP"; // You are registered
+				}
+				if (app.classObjects[i] !== undefined){
+					if (app.classObjects[i].crn.toString().substring(1) === x.crn){ // Waitlisted
+						$("#"+x.crn).css("background-color",color3);
+						return "WAIT"; // You are waitlisted
+					}
+				}
+				if (app.classObjects[i] !== undefined){
+					if (app.classObjects[i].times === x.times){ // Time Conflict
+						$("#"+x.crn).css("background-color",color4);
+						return "TIME"; // You are waitlisted
+					}
 				}
 			}
-			return false;
+			return "REG"; // You are not registered
 		},
-		registerClass: function(x){
+		registerClass: function(crn,capacity){
 			var username = app.profile.university_id;
-			$.post("registerClass", {username: username, crn: x}, function(data) {
+			$.post("registerClass", {username: username, crn: crn, capacity: capacity}, function(data) {
                  if (data === 'done') {
 					 app.getUser();
                  }
@@ -80,9 +99,10 @@ var app = new Vue({
 				 }
              });
 		},
-		dropClass: function(x){
+		dropClass: function(crn){
 			var username = app.profile.university_id;
-			$.post("dropClass", {username: username, crn: x}, function(data) {
+			console.log(username,crn);
+			$.post("dropClass", {username: username, crn: crn}, function(data) {
                  if (data === 'done') {
 					 app.getUser();
                  }
@@ -90,10 +110,68 @@ var app = new Vue({
 					 $('#errormessage').text("ERROR: Drop Class");
 				 }
              });
+		},
+		getSchedule: function(){
+			var text = [];
+			text["mon"] = "";
+			text["tue"] = "";
+			text["wed"] = "";
+			text["thu"] = "";
+			text["fri"] = "";
+			for(var i=0; i<app.classObjects.length; i++)
+			{
+				var x = app.classObjects[i].times.indexOf(" ");
+				if (app.classObjects[i].times.substring(0,x).indexOf("M") !== -1){
+					text["mon"] += ('<div id="M'+app.classObjects[i].crn+'">'+app.classObjects[i].subject+app.classObjects[i].course_number+" "+app.classObjects[i].times+"<br><br>");
+					text["mon"] += '<button onclick="app.btnClick('+app.classObjects[i].crn+',\''+app.classObjects[i].times.substring(0,x)+'\')">Drop</button></div>'
+				}
+				if (app.classObjects[i].times.substring(0,x).indexOf("T") !== -1){
+					text["tue"] += ('<div id="T'+app.classObjects[i].crn+'">'+app.classObjects[i].subject+app.classObjects[i].course_number+" "+app.classObjects[i].times+"<br><br>");
+					text["tue"] += '<button onclick="app.btnClick('+app.classObjects[i].crn+',\''+app.classObjects[i].times.substring(0,x)+'\')">Drop</button></div>';
+				}
+				if (app.classObjects[i].times.substring(0,x).indexOf("W") !== -1){
+					text["wed"] += ('<div id="W'+app.classObjects[i].crn+'">'+app.classObjects[i].subject+app.classObjects[i].course_number+" "+app.classObjects[i].times+"<br><br>");
+					text["wed"] += '<button onclick="app.btnClick('+app.classObjects[i].crn+',\''+app.classObjects[i].times.substring(0,x)+'\')">Drop</button></div>';
+				}
+				if (app.classObjects[i].times.substring(0,x).indexOf("R") !== -1){
+					text["thu"] += ('<div id="R'+app.classObjects[i].crn+'">'+app.classObjects[i].subject+app.classObjects[i].course_number+" "+app.classObjects[i].times+"<br><br>");
+					text["thu"] += '<button onclick="app.btnClick('+app.classObjects[i].crn+',\''+app.classObjects[i].times.substring(0,x)+'\')">Drop</button></div>';
+				}
+				if (app.classObjects[i].times.substring(0,x).indexOf("F") !== -1){
+					text["fri"] += ('<div id="F'+app.classObjects[i].crn+'">'+app.classObjects[i].subject+app.classObjects[i].course_number+" "+app.classObjects[i].times+"<br><br>");
+					text["fri"] += '<button onclick="app.btnClick('+app.classObjects[i].crn+',\''+app.classObjects[i].times.substring(0,x)+'\')">Drop</button></div>';
+				}
+			}
+			
+			$("#schedule").css("display","block");
+			$("#mon").html(text["mon"]);
+			$("#tue").html(text["tue"]);
+			$("#wed").html(text["wed"]);
+			$("#thu").html(text["thu"]);
+			$("#fri").html(text["fri"]);
+			app.showSchedule = true;
+		},
+		btnClick: function(crn,x){// Schedule Drop button
+			app.dropClass(crn); 
+			for(var i=0; i <x.length; i++){
+				$("#"+x.charAt(i)+crn).css("display", "none");
+			}
+		},
+		hideSchedule: function(){
+			$("#schedule").css("display", "none");
+			app.showSchedule = false;
+		},
+		getClasses: function(){
+			var req = "";
+			var userName = localStorage.getItem("user");
+            req = "classes?university_id=" + userName;
+            $.getJSON(req, function(data) {
+                app.classObjects = data;
+            });
 		}
 		
     },
-    computed: {
+	computed: {
         sortedCourses: function() {
             return this.courses.sort((a,b) => {
                 let modifier = 1;
@@ -107,9 +185,8 @@ var app = new Vue({
     // Load departments on page load
     mounted() {
         this.getDepartments();
-        this.getUser();
+		this.getUser();
     }
 });
-
 function showLoading() { document.getElementById("loading").style.display = "block"; }
 function hideLoading() { document.getElementById("loading").style.display = "none"; }

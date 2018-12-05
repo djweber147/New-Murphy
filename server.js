@@ -75,7 +75,7 @@ app.post('/newuser', function(req, res) {
 			}
 			else{
 				if(row === undefined){ // If there does not exist a university_id with this number...
-					db.run("INSERT INTO people VALUES (?,?,?,?,?,NULL);", username, position, password, fname, lname, function(err) {
+					db.run("INSERT INTO people VALUES (?,?,?,?,?,NULL,NULL);", username, position, password, fname, lname, function(err) {
 						 if(err) {
 							console.log(err);
 						 }
@@ -94,9 +94,10 @@ app.post('/newuser', function(req, res) {
 
 // Regester for a class
 app.post('/registerClass', function(req, res) {
-     var username = req.body.username;
-     var crn = req.body.crn;
+    var username = req.body.username;
+    var crn = req.body.crn;
 	var registered_courses;
+	var capacity = req.body.capacity;
      
      // Could use more error checking along the way (values can't be '')
 	 if (isNaN(username)){
@@ -110,7 +111,13 @@ app.post('/registerClass', function(req, res) {
 			}
 			else{
 				if(registered_courses !== null){
-					registered_courses = row.registered_courses + ", " + crn;
+					var list = registered_courses.split(", ");
+					if (list.length >= capacity){ // Add to Waitlist
+						registered_courses = row.registered_courses + ", W" + crn;
+					}
+					else{
+						registered_courses = row.registered_courses + ", " + crn;
+					}
 				}
 				else{
 					registered_courses = crn;
@@ -145,6 +152,12 @@ app.post('/dropClass', function(req, res) {
 				console.log(err);
 			}
 			else{
+				var w = registered_courses.indexOf("W"); 
+				// Find if someone is waitlisted, if so, add them to the class
+				if (w !== -1)
+				{
+					registered_courses = registered_courses.replace("W","")
+				}
 				registered_courses = registered_courses.replace(crn+", ","");
 				registered_courses = registered_courses.replace(", "+crn,"");
 				registered_courses = registered_courses.replace(crn,"");
@@ -153,7 +166,7 @@ app.post('/dropClass', function(req, res) {
 						console.log(err);
 					 }
 					 else{
-						 res.end("done");
+						res.end("done");
 					 }
 				 });
 				}
@@ -174,6 +187,7 @@ app.get('/searchdept', function(req, res) {
 		}
 	});  	
 });
+
 
 // Process courses
 app.get('/courses', function(req, res) {
@@ -247,9 +261,46 @@ app.get('/userProfile', function(req, res) {
 	});  	
 });
 
+// Get User Data
+app.get('/classes', function(req, res) {
+	var query = url.parse(req.url, true).query;
+    var university_id = query.university_id;
+	console.log("HERE");
+	db.get("SELECT * FROM people WHERE university_id = ?;",university_id,function(err,row){
+		if(err) {
+			console.log(err);
+		}
+		else{
+			if (row !== null)
+			{
+				console.log(row.registered_courses);
+				var list = row.registered_courses.split(', ');
+				var r = "";
+				for(var i=0; i<list.length; i++){
+					if (isNaN(list[i]) === false && list[i] !== undefined && list[i] !== null && list[i] !== "undefined" && list[i] !== ""){
+						if (r === ""){
+							r += "crn = "+list[i];
+						}
+						else{
+							r += " OR crn = "+list[i];
+						}
+					}
+				}
+				console.log(r+";");
+				db.all("SELECT * FROM sections WHERE "+r+";",function(err,rows){
+					if(err) {
+						console.log(err);
+					}
+					else{
+						res.end(JSON.stringify(rows));
+					}
+				});
+			}
+		}
+	});  	
+});
+
 // Start Server
 app.listen(8005, function() {
     console.log("Started on PORT 8005");
 });
-
-

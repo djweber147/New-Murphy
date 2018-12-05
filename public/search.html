@@ -9,7 +9,6 @@
         <script type="application/javascript" src="https://cdn.jsdelivr.net/npm/vue"></script>
     </head>
     <body v-on:load="app.getUser()">
-        <div id="loading"><img src="img/loading.gif" /></div>
         <div class="row">
             <div class="twelve columns">
                 <center><img src="img/murphy.jpg" alt="Welcome to Murphy Online!!"></center>
@@ -37,7 +36,27 @@
                 <input class="u-full-width" type="number" placeholder="213423" id="crn" v-model="req_crn">
                 
                 <button type="button" v-on:click="app.getCourses()" class="button-primary">Search</button>
-                
+                <button type="button" v-on:click="app.hideSchedule()" class="button" v-if="showSchedule">Hide Schedule</button>
+				<button type="button"  v-on:click="app.getSchedule()" class="button" v-else>Show Schedule</button>
+				<div id="schedule" class="u-full-width" style="display: none">
+					<table>
+						<tr>
+							<th>Monday</th>
+							<th>Tuesday</th>
+							<th>Wednesday</th>
+							<th>Thursday</th>
+							<th>Friday</th>
+						</tr>
+						<tr>
+							<td id="mon"></td>
+							<td id="tue"></td>
+							<td id="wed"></td>
+							<td id="thu"></td>
+							<td id="fri"></td>
+						</tr>
+					</table>
+
+				</div>
 				<label id="errormessage" style="color: red" value=""></label>
                 <table id="classList">
                     <tr>
@@ -56,11 +75,13 @@
 						<td>{{ course.professors }}</td>
 						<td>{{ course.times }}</td>
 						<td>{{ course.capacity }}</td>
-						<td v-if="checkProfile(course.crn)"><button @click="dropClass(course.crn)">Drop</button></td>
-						<td v-else><button @click="registerClass(course.crn)">Register</button></td>
+						<td v-if="checkProfile(course) === 'DROP'"><button @click="dropClass(course.crn)">Drop</button></td>
+						<td v-else-if="checkProfile(course) === 'REG'"><button @click="registerClass(course.crn,course.capacity)">Register</button></td>
+						<td v-else-if="checkProfile(course) === 'WAIT'"><button @click="dropClass(course.crn)">Drop (Waitlist)</button></td>
+						<td v-else-if="checkProfile(course) === 'TIME'" style="color: red">Time Conflict</td>
                     </tr>
                     <tr>
-                        <td colspan="6" v-if="courses==''">
+                        <td colspan="7" v-if="courses==''">
                             <i>No Courses Available</i>
                         </td>
                     </tr>

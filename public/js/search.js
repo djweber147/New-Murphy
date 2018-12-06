@@ -12,7 +12,8 @@ var app = new Vue({
 		classObjects: [],
 		check: false,
 		currentSort: 'coursenumber',
-        currentSortDir: 'desc'
+        currentSortDir: 'desc',
+		view: false
     },
     methods: {
         getDepartments: function() {
@@ -39,6 +40,7 @@ var app = new Vue({
             req = "userProfile?university_id=" + userName;
             $.getJSON(req, function(data) {
                 app.profile = data;
+				//console.log(app.profile, "Profile");
             });
 			this.getClasses();
         },
@@ -68,22 +70,25 @@ var app = new Vue({
 			if(app.profile.registered_courses == null ){
 				return "REG"; // You are not registered
 			}
-			//var list = app.profile.registered_courses.split(', ');
 			for(var i = 0; i < app.classObjects.length; i++){
 				if (app.classObjects[i].crn === x.crn){
 					$("#"+x.crn).css("background-color",color2);
+					
 					return "DROP"; // You are registered
-				}
-				if (app.classObjects[i] !== undefined){
-					if (app.classObjects[i].crn.toString().substring(1) === x.crn){ // Waitlisted
-						$("#"+x.crn).css("background-color",color3);
-						return "WAIT"; // You are waitlisted
-					}
 				}
 				if (app.classObjects[i] !== undefined){
 					if (app.classObjects[i].times === x.times){ // Time Conflict
 						$("#"+x.crn).css("background-color",color4);
 						return "TIME"; // You are waitlisted
+					}
+				}
+			}
+			if (app.profile !== null){
+				var list = app.profile.registered_courses.split(", ");
+				for(var i=0; i< list.length; i++){
+					if (list[i].toString().substring(1) === x.crn.toString()){ // Wait listed
+						$("#"+x.crn).css("background-color",color3);
+						return "WAIT"; // You are waitlisted
 					}
 				}
 			}
@@ -104,6 +109,7 @@ var app = new Vue({
 			var username = app.profile.university_id;
 			console.log(username,crn);
 			$.post("dropClass", {username: username, crn: crn}, function(data) {
+				console.log(data, "DROP");
                  if (data === 'done') {
 					 app.getUser();
                  }
@@ -167,8 +173,43 @@ var app = new Vue({
 			var userName = localStorage.getItem("user");
             req = "classes?university_id=" + userName;
             $.getJSON(req, function(data) {
-                app.classObjects = data;
+				if(data != "{prob: 0}")
+				{
+					app.classObjects = data;
+				}
+				else{
+					app.classObjects = [];
+				}
             });
+		},
+		viewClass: function(crn,cap){ // Faculty get class
+			var req = "";
+			var obj = null;
+            req = "roster?crn=" + crn;
+            $.getJSON(req, function(data) {
+                obj = data;
+				var text = "";
+				text += '<button onclick="app.hideClass(\''+crn+'\')">Hide Class</button><br>';
+				var text2 = "";
+				var x = false;
+				for(var i=0; i<obj.length; i++){
+					if(i >= cap && x == false)
+					{
+						x = true;
+						text2 += "<b>Waitlist</b><br>"
+					}
+					text2 += obj[i].university_id + " " + obj[i].first_name + " " + obj[i].last_name + "<br>"; 
+				}
+				if (text2 === ""){
+					$("#roster"+crn).html(text+"<i>No Students Registered</i>");
+				}
+				else{
+					$("#roster"+crn).html(text+text2);
+				}
+            });
+		},
+		hideClass: function(crn){
+			$("#roster"+crn).html('<button onclick="app.viewClass(\''+crn+'\')">View Class</button>');
 		}
 		
     },

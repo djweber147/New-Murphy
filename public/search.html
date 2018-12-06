@@ -37,8 +37,10 @@
                 <input class="u-full-width" type="number" placeholder="213423" id="crn" v-model="req_crn">
                 
                 <button type="button" v-on:click="app.getCourses()" class="button-primary">Search</button>
+				<div v-if="profile.position === 'STUDENT'">
                 <button type="button" v-on:click="app.hideSchedule()" class="button" v-if="showSchedule">Hide Schedule</button>
 				<button type="button"  v-on:click="app.getSchedule()" class="button" v-else>Show Schedule</button>
+				</div>
 				<div id="schedule" class="u-full-width" style="display: none">
 					<table>
 						<tr>
@@ -76,10 +78,11 @@
 						<td>{{ course.professors }}</td>
 						<td>{{ course.times }}</td>
 						<td>{{ course.capacity }}</td>
-						<td v-if="checkProfile(course) === 'DROP'"><button @click="dropClass(course.crn)">Drop</button></td>
-						<td v-else-if="checkProfile(course) === 'REG'"><button @click="registerClass(course.crn,course.capacity)">Register</button></td>
-						<td v-else-if="checkProfile(course) === 'WAIT'"><button @click="dropClass(course.crn)">Drop (Waitlist)</button></td>
-						<td v-else-if="checkProfile(course) === 'TIME'" style="color: red">Time Conflict</td>
+						<td v-if="profile.position === 'STUDENT' && checkProfile(course) === 'DROP'"><button @click="dropClass(course.crn)">Drop</button></td>
+						<td v-else-if="profile.position === 'STUDENT' && checkProfile(course) === 'REG'"><button @click="registerClass(course.crn,course.capacity)">Register</button></td>
+						<td v-else-if="profile.position === 'STUDENT' && checkProfile(course) === 'WAIT'"><button @click="dropClass(course.crn)">Drop (Waitlist)</button></td>
+						<td v-else-if="profile.position === 'STUDENT' && checkProfile(course) === 'TIME'" style="color: red">Time Conflict</td>
+						<td v-bind:id="'roster'+course.crn" v-else-if="profile.position === 'FACULTY'"><button @click="viewClass(course.crn,course.capacity)">View Class</button></td>
                     </tr>
                     <tr>
                         <td colspan="7" v-if="courses==''">

@@ -110,28 +110,55 @@ app.post('/registerClass', function(req, res) {
 				console.log(err);
 			}
 			else{
-				if(registered_courses !== null){
-					var list = registered_courses.split(", ");
-					if (list.length >= capacity){ // Add to Waitlist
-						registered_courses = row.registered_courses + ", W" + crn;
-					}
-					else{
-						registered_courses = row.registered_courses + ", " + crn;
-					}
-				}
-				else{
-					registered_courses = crn;
-				}
-				db.run("UPDATE people SET registered_courses = ? WHERE university_id = ?;", registered_courses, username, function(err) {
+				db.get("SELECT * FROM sections WHERE crn = ?;", crn, function(err,row2) {
 					 if(err) {
 						console.log(err);
 					 }
 					 else{
-						 res.end("done");
+						console.log(registered_courses,"nnnnnn");
+						registered_courses2 = row2.registered;
+						var list2 = "";
+						if(row2.registered !== "--"){
+							list2 = registered_courses2.split(", ");
+						}
+						console.log(list2.length,capacity);
+						if (list2.length > capacity){ // Add to Waitlist in course
+							registered_courses2 = row2.registered + ", W" + username;
+							if(registered_courses !== null){
+								registered_courses = row.registered_courses + ", W" + crn;
+							}
+							else{
+								registered_courses = "W" + crn;
+							}
+						}
+						else{
+							registered_courses2 = row2.registered + ", " + username;
+							if(registered_courses !== null){
+								registered_courses = row.registered_courses + ", " + crn;
+							}
+							else{
+								registered_courses = crn;
+							}
+						}
+						console.log(registered_courses,"nnnnnn2");
+						db.run("UPDATE sections SET registered = ? WHERE crn = ?;", registered_courses2, crn, function(err) {
+							 if(err) {
+								console.log(err);
+							 }
+							 else{
+								 res.end("done");
+							 }
+						 });
+						 db.run("UPDATE people SET registered_courses = ? WHERE university_id = ?;", registered_courses, username, function(err) {
+							 if(err) {
+								console.log(err);
+							 }
+						 });
 					 }
-				 });
-				}
+				});	 
+			}
 		 });
+		 
 	 }
 });
 
@@ -140,7 +167,7 @@ app.post('/dropClass', function(req, res) {
     var username = req.body.username;
     var crn = req.body.crn;
 	var registered_courses;
-     
+    console.log(crn);
      // Could use more error checking along the way (values can't be '')
 	 if (isNaN(username)){
 		 res.end("err"); // Invalid field
@@ -152,24 +179,112 @@ app.post('/dropClass', function(req, res) {
 				console.log(err);
 			}
 			else{
-				var w = registered_courses.indexOf("W"); 
-				// Find if someone is waitlisted, if so, add them to the class
-				if (w !== -1)
-				{
-					registered_courses = registered_courses.replace("W","")
-				}
-				registered_courses = registered_courses.replace(crn+", ","");
-				registered_courses = registered_courses.replace(", "+crn,"");
-				registered_courses = registered_courses.replace(crn,"");
-				db.run("UPDATE people SET registered_courses = ? WHERE university_id = ?;", registered_courses, username, function(err) {
-					 if(err) {
+				db.get("SELECT registered FROM sections WHERE crn = ?;",crn,function(err,row2){
+					registered_courses2 = row2.registered;
+					//console.log(registered_courses2,"G",registered_courses,"GERRRRR");
+					if(err) {
 						console.log(err);
-					 }
-					 else{
-						res.end("done");
-					 }
-				 });
-				}
+					}
+					else{
+						var userList = registered_courses.split(", ");
+						var userListFinal = "";
+						var list = registered_courses2.split(", ");
+						var list2 = "";
+						var x = true;
+						//console.log(userList);
+						(function(){
+						for(var i=0; i<list.length; i++){
+							console.log(list[i],username);
+							if(list[i].toString() === username.toString()){
+								// don't add
+								//console.log(list[i],username);
+								for(var j=0; j<userList.length; j++){
+									console.log(crn,userList[j],"HERE");
+									if (crn.toString() === userList[j].toString())
+									{
+										userList[j] = ""; // DROPPING
+										list[i] = "";
+									}
+									if (crn.toString() === userList[j].toString().substring(1))
+									{
+										userList[j] = ""; // DROPPING
+										list[i] = "";
+									}
+								}
+								x = false;
+							}
+							else if(list[i].toString() === "W"+username.toString()){
+								// don't add
+								//console.log(list[i],username);
+								for(var j=0; j<userList.length; j++){
+									console.log(crn,userList[j],"HERE W");
+									if (crn.toString() === userList[j].toString())
+									{
+										userList[j] = ""; // DROPPING
+										list[i] = "";
+									}
+									if (crn.toString() === userList[j].toString().substring(1))
+									{
+										userList[j] = ""; // DROPPING
+										list[i] = "";
+									}
+								}
+								x = false;
+							}
+							else if (isNaN(list[i]) === true && list[i].indexOf("W") !== -1 && x === true){
+								for(var j=0; j<userList.length; j++){
+									if (crn.toString() === userList[j].toString().substring(1))
+									{	
+										console.log(list[i],userList[j],"ADD W");
+										userList[j] = userList[j].replace("W","");
+									}
+								}
+								list[i] = list[i].replace("W","");
+								list2 += list[i];
+								if(i !== list.length-1){
+									list2 += ", ";
+								}
+								x = false;
+							}
+							else{
+								list2 += list[i];
+								if(i !== list.length-1 && list[i] !== ""){
+									list2 += ", ";
+								}
+							}
+						}
+						})();
+						//console.log(userList,"Problem");
+						for(var j=0; j<userList.length; j++){
+							userListFinal += userList[j];
+							if(j !== userList.length-1){
+								userListFinal += ", ";
+							}
+						}
+						console.log(userListFinal);
+						registered_courses = userListFinal;
+						registered_courses2 = list2;
+						//console.log(registered_courses2,"G",registered_courses,"GERRRRR2");
+						db.run("UPDATE sections SET registered = ? WHERE crn = ?;", registered_courses2, crn, function(err) {
+							 if(err) {
+								console.log(err);
+							 }
+							 else{
+								res.end("done");
+							 }
+						 });
+						 if(registered_courses === ""){
+							registered_courses = null;
+						}
+						db.run("UPDATE people SET registered_courses = ? WHERE university_id = ?;", registered_courses, username, function(err) {
+							 if(err) {
+								console.log(err);
+							 }
+						});
+					}
+				});
+			}
+			
 		 });
 	 }
 });
@@ -261,33 +376,42 @@ app.get('/userProfile', function(req, res) {
 	});  	
 });
 
-// Get User Data
-app.get('/classes', function(req, res) {
+// Get Class List
+app.get('/roster', function(req, res) {
 	var query = url.parse(req.url, true).query;
-    var university_id = query.university_id;
-	console.log("HERE");
-	db.get("SELECT * FROM people WHERE university_id = ?;",university_id,function(err,row){
+    var crn = query.crn;
+	console.log("SELECT registered FROM sections WHERE crn = "+crn);
+	db.get("SELECT registered FROM sections WHERE crn = ?;",crn,function(err,row){
 		if(err) {
 			console.log(err);
 		}
 		else{
-			if (row !== null)
-			{
-				console.log(row.registered_courses);
-				var list = row.registered_courses.split(', ');
+			console.log(row);
+			if (row !== null && row.registered !== "--" && row.registered !== ""){
+				var list = row.registered.split(', ');
 				var r = "";
 				for(var i=0; i<list.length; i++){
-					if (isNaN(list[i]) === false && list[i] !== undefined && list[i] !== null && list[i] !== "undefined" && list[i] !== ""){
+					if (list[i][0] === "W"){
+						if (list[i].substring(1) !== undefined && list[i].substring(1) !== null && list[i].substring(1) !== "undefined" && list[i].substring(1) !== ""){
+							if (r === ""){
+								r += "university_id = "+list[i].substring(1);
+							}
+							else{
+								r += " OR university_id = "+list[i].substring(1);
+							}
+						}
+					}
+					else if (isNaN(list[i]) === false && list[i] !== undefined && list[i] !== null && list[i] !== "undefined" && list[i] !== ""){
 						if (r === ""){
-							r += "crn = "+list[i];
+							r += "university_id = "+list[i];
 						}
 						else{
-							r += " OR crn = "+list[i];
+							r += " OR university_id = "+list[i];
 						}
 					}
 				}
-				console.log(r+";");
-				db.all("SELECT * FROM sections WHERE "+r+";",function(err,rows){
+				console.log("SELECT * FROM people WHERE "+r+";");
+				db.all("SELECT * FROM people WHERE "+r+";",function(err,rows){
 					if(err) {
 						console.log(err);
 					}
@@ -295,6 +419,60 @@ app.get('/classes', function(req, res) {
 						res.end(JSON.stringify(rows));
 					}
 				});
+			}
+			else{
+				res.end(JSON.stringify(row));
+			}
+			
+		}
+	});  	
+});
+
+// Get User Data
+app.get('/classes', function(req, res) {
+	var query = url.parse(req.url, true).query;
+    var university_id = query.university_id;
+	console.log("HERE-CLASSES");
+	db.get("SELECT * FROM people WHERE university_id = ?;",university_id,function(err,row){
+		if(err) {
+			console.log(err);
+		}
+		else{
+			if (row !== null)
+			{
+				console.log(row.registered_courses,"REG");
+				if(row.registered_courses !== null){
+					var list = row.registered_courses.split(', ');
+					var r = "";
+					for(var i=0; i<list.length; i++){
+						if (isNaN(list[i]) === false && list[i] !== undefined && list[i] !== null && list[i] !== "undefined" && list[i] !== ""){
+							if (r === ""){
+								r += "crn = "+list[i];
+							}
+							else{
+								r += " OR crn = "+list[i];
+							}
+						}
+					}
+					console.log(r+";","STMT");
+					if(r !== "")
+					{
+						db.all("SELECT * FROM sections WHERE "+r+";",function(err,rows){
+							if(err) {
+								console.log(err);
+							}
+							else{
+								res.end(JSON.stringify(rows));
+							}
+						});
+					}
+					else{
+						res.end(JSON.stringify({prob: 0}));
+					}
+				}
+				else{
+					res.end(JSON.stringify({prob: 0}));
+				}
 			}
 		}
 	});  	
@@ -304,3 +482,5 @@ app.get('/classes', function(req, res) {
 app.listen(8005, function() {
     console.log("Started on PORT 8005");
 });
+
+

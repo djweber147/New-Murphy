@@ -9,7 +9,7 @@
         <script type="application/javascript" src="https://cdn.jsdelivr.net/npm/vue"></script>
     </head>
     <body v-on:load="app.getUser()">
-		<div id="loading"><img src="img/loading.gif" /></div>
+		<div id="loading"><img id="loadingimg" src="img/loading.gif" /></div>
         <div class="row">
             <div class="twelve columns">
                 <center><img src="img/murphy.jpg" alt="Welcome to Murphy Online!!"></center>
@@ -37,10 +37,10 @@
                 <input class="u-full-width" type="number" placeholder="213423" id="crn" v-model="req_crn">
                 
                 <button type="button" v-on:click="app.getCourses()" class="button-primary">Search</button>
-				<div v-if="profile.position === 'STUDENT'">
+				<span v-if="profile.position === 'STUDENT'">
                 <button type="button" v-on:click="app.hideSchedule()" class="button" v-if="showSchedule">Hide Schedule</button>
 				<button type="button"  v-on:click="app.getSchedule()" class="button" v-else>Show Schedule</button>
-				</div>
+				</span>
 				<div id="schedule" class="u-full-width" style="display: none">
 					<table>
 						<tr>
@@ -63,7 +63,7 @@
 				<label id="errormessage" style="color: red" value=""></label>
                 <table id="classList">
                     <tr>
-                        <th @click="app.sortRows('crn')">CRN</th>
+                        <th @click="app.sortRows('crn')" style="padding-left: 5px">CRN</th>
                         <th @click="app.sortRows('subject')">Course Number</th>
                         <th @click="app.sortRows('building')">Location</th>
                         <th @click="app.sortRows('professors')">Professor</th>
@@ -71,24 +71,34 @@
                         <th @click="app.sortRows('capacity')">Capacity</th>
 						<th>Register/Drop</th>
                     </tr>
-                    <tr v-bind:id="course.crn" v-for="course in sortedCourses" @click="app.addRow(event)">
-						<td>{{ course.crn }}</td>
-						<td>{{ course.subject }} {{ course.course_number }}-{{ course.section_number }}</td>
-						<td>{{ course.building }} {{ course.room }} </td>
-						<td>{{ course.professors }}</td>
-						<td>{{ course.times }}</td>
-						<td>{{ course.capacity }}</td>
-						<td v-if="profile.position === 'STUDENT' && checkProfile(course) === 'DROP'"><button @click="dropClass(course.crn)">Drop</button></td>
-						<td v-else-if="profile.position === 'STUDENT' && checkProfile(course) === 'REG'"><button @click="registerClass(course.crn,course.capacity)">Register</button></td>
-						<td v-else-if="profile.position === 'STUDENT' && checkProfile(course) === 'WAIT'"><button @click="dropClass(course.crn)">Drop (Waitlist)</button></td>
-						<td v-else-if="profile.position === 'STUDENT' && checkProfile(course) === 'TIME'" style="color: red">Time Conflict</td>
-						<td v-bind:id="'roster'+course.crn" v-else-if="profile.position === 'FACULTY'"><button @click="viewClass(course.crn,course.capacity)">View Class</button></td>
-                    </tr>
-                    <tr>
-                        <td colspan="7" v-if="courses==''">
-                            <i>No Courses Available</i>
-                        </td>
-                    </tr>
+                    <tbody>
+                        <template v-for="(course, index) in sortedCourses" :key="index">
+                            <tr v-bind:id="course.crn">
+                                <td style="padding-left: 5px" @click.stop="rowClicked(index)">{{ course.crn }}</td>
+                                <td @click.stop="rowClicked(index)">{{ course.subject }} {{ course.course_number }}-{{ course.section_number }}</td>
+                                <td @click.stop="rowClicked(index)">{{ course.building }} {{ course.room }} </td>
+                                <td @click.stop="rowClicked(index)">{{ course.professors }}</td>
+                                <td @click.stop="rowClicked(index)">{{ course.times }}</td>
+                                <td @click.stop="rowClicked(index)">{{ course.capacity }}</td>
+                                <td v-if="profile.position === 'STUDENT' && checkProfile(course) === 'DROP'"><button @click="dropClass(course.crn)">Drop</button></td>
+                                <td v-else-if="profile.position === 'STUDENT' && checkProfile(course) === 'REG'"><button @click="registerClass(course.crn,course.capacity)">Register</button></td>
+                                <td v-else-if="profile.position === 'STUDENT' && checkProfile(course) === 'WAIT'"><button @click="dropClass(course.crn)">Drop (Waitlist)</button></td>
+                                <td v-else-if="profile.position === 'STUDENT' && checkProfile(course) === 'TIME'" style="color: red">Time Conflict</td>
+                                <td v-bind:id="'roster'+course.crn" v-else-if="profile.position === 'FACULTY'"><button @click="viewClass(course.crn,course.capacity)">View Class</button></td>
+                            </tr>
+                            <tr v-if="index === clickedRow">
+                                <td colspan="7">
+                                    <p><big>{{ course.name }}</big></p>
+                                    <p><i>{{ course.credits}} Credits</i></p>
+                                    <p>{{ course.description }}</p></td>
+                            </tr>
+                        </template>
+                        <tr>
+                            <td colspan="7" v-if="courses==''">
+                                <i>No Courses Available</i>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>

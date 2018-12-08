@@ -326,7 +326,7 @@ app.get('/courses', function(req, res) {
             departments = departments.toString().replace(/,/g, "\" OR subject = \"");
          }
      
-        stmt = "SELECT * FROM sections WHERE";
+        stmt = "SELECT sections.*, courses.credits, courses.description, courses.name FROM sections LEFT JOIN courses ON (sections.subject = courses.subject AND sections.course_number = courses.course_number) WHERE";
      
         // If CRN is provided
         if (crn != "") {
@@ -335,14 +335,14 @@ app.get('/courses', function(req, res) {
             stmt += ";";
         }
         else if (coursenumber.trim() != "") {
-             stmt += " course_number = ";
+             stmt += " sections.course_number = ";
              stmt += coursenumber;
-             stmt += " AND (subject = \"";
+             stmt += " AND (sections.subject = \"";
              stmt += departments;
              stmt += "\");";
         }
         else {
-             stmt += " (subject = \"";
+             stmt += " (sections.subject = \"";
              stmt += departments;
              stmt += "\");";
         }

@@ -1,6 +1,7 @@
 var app = new Vue({
     el: '#app',
     data: {
+        clickedRow: -1,
         req_coursenumber: '',
         req_crn: '',
         req_departments: [],
@@ -16,6 +17,15 @@ var app = new Vue({
 		view: false
     },
     methods: {
+        rowClicked: function(index) {
+                  if ($(this).attr("id") == "action") { console.log("f");}
+            if (this.clickedRow == index) {
+                this.clickedRow = -1;
+            }
+            else {
+                this.clickedRow = index;
+            }
+        },
         getDepartments: function() {
 			showLoading();
             $.getJSON("searchdept",function(data) {
@@ -44,6 +54,9 @@ var app = new Vue({
             });
 			this.getClasses();
         },
+        getCourseDescription: function() {
+            
+        },
 		sortRows: function(s) {
             //if s == current sort, reverse
             if(s === this.currentSort) {
@@ -60,10 +73,10 @@ var app = new Vue({
 				app.getUser();
 				app.check = true;
 			}
-			var color1 = "#a29ca8"; // Gray for unregistered
-			var color2 = "#a362e0"; // light purple for registered
-			var color3 = "#d2f287"; // light yellow for waitlist
-			var color4 = "#f4b942"; // Orange for time conflict
+			var color1 = "#dcdcdc"; // Gray for unregistered
+			var color2 = "#b91be5"; // light purple for registered
+			var color3 = "#e5b91b"; // light yellow for waitlist
+			var color4 = "#848484"; // dark gray for time conflict
 			
 			$("#"+x.crn).css("background-color",color1); // Set Color
 			
@@ -96,6 +109,7 @@ var app = new Vue({
 		},
 		registerClass: function(crn,capacity){
 			var username = app.profile.university_id;
+            showLoading();
 			$.post("registerClass", {username: username, crn: crn, capacity: capacity}, function(data) {
                  if (data === 'done') {
 					 app.getUser();
@@ -103,11 +117,12 @@ var app = new Vue({
 				 else {
 					 $('#errormessage').text("ERROR: Register Class");
 				 }
+                 hideLoading();
              });
 		},
 		dropClass: function(crn){
 			var username = app.profile.university_id;
-			console.log(username,crn);
+            showLoading();
 			$.post("dropClass", {username: username, crn: crn}, function(data) {
 				console.log(data, "DROP");
                  if (data === 'done') {
@@ -116,6 +131,7 @@ var app = new Vue({
 				 else {
 					 $('#errormessage').text("ERROR: Drop Class");
 				 }
+                 hideLoading();
              });
 		},
 		getSchedule: function(){
@@ -232,3 +248,7 @@ var app = new Vue({
 });
 function showLoading() { document.getElementById("loading").style.display = "block"; }
 function hideLoading() { document.getElementById("loading").style.display = "none"; }
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}

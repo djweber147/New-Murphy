@@ -75,7 +75,7 @@ app.post('/newuser', function(req, res) {
 			}
 			else{
 				if(row === undefined){ // If there does not exist a university_id with this number...
-					db.run("INSERT INTO people VALUES (?,?,?,?,?,NULL,NULL);", username, position, password, fname, lname, function(err) {
+					db.run("INSERT INTO people VALUES (?,?,?,?,?,NULL);", username, position, password, fname, lname, function(err) {
 						 if(err) {
 							console.log(err);
 						 }
@@ -323,7 +323,7 @@ app.get('/courses', function(req, res) {
          
         // Prepare statement (susceptible to sql injection)
         if (departments !== undefined) {
-            departments = departments.toString().replace(/,/g, "\" OR subject = \"");
+            departments = departments.toString().replace(/,/g, "\" OR sections.subject = \"");
          }
      
         stmt = "SELECT sections.*, courses.credits, courses.description, courses.name FROM sections LEFT JOIN courses ON (sections.subject = courses.subject AND sections.course_number = courses.course_number) WHERE";

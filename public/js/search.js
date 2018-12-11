@@ -13,12 +13,11 @@ var app = new Vue({
 		classObjects: [],
 		check: false,
 		currentSort: 'coursenumber',
-        currentSortDir: 'desc',
+        currentSortDir: 'asc',
 		view: false
     },
     methods: {
         rowClicked: function(index) {
-                  if ($(this).attr("id") == "action") { console.log("f");}
             if (this.clickedRow == index) {
                 this.clickedRow = -1;
             }
@@ -245,6 +244,16 @@ var app = new Vue({
                 if (this.currentSortDir === 'desc') modifier = -1;
                 if (a[this.currentSort] < b[this.currentSort]) return -1 * modifier;
                 if (a[this.currentSort] > b[this.currentSort]) return 1 * modifier;
+                if (a[this.currentSort] == b[this.currentSort]) {
+                    if (this.currentSort == 'building') {
+                                 if (a['room'] < b['room']) return -1 * modifier;
+                                 if (a['room'] > b['room']) return 1 * modifier;
+                    }
+                    if (this.currentSort == 'subject') {
+                                 if (a['course_number'] < b['course_number']) return -1 * modifier;
+                                 if (a['course_number'] > b['course_number']) return 1 * modifier;
+                    }
+                }
                 return 0;
             });
         }

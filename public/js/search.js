@@ -26,6 +26,14 @@ var app = new Vue({
                 this.clickedRow = index;
             }
         },
+        getNumber: function(list) {
+            var results = list.split(",");
+            var count = 0;
+                  for (var i=0; i < results.length; i++) {
+                  if (results[i].trim() !== "" && results[i].trim() !== "--") count++;
+                  }
+            return count;
+        },
         getDepartments: function() {
 			showLoading();
             $.getJSON("searchdept",function(data) {
@@ -231,6 +239,7 @@ var app = new Vue({
     },
 	computed: {
         sortedCourses: function() {
+            this.clickedRow = -1;
             return this.courses.sort((a,b) => {
                 let modifier = 1;
                 if (this.currentSortDir === 'desc') modifier = -1;

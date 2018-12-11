@@ -41,8 +41,8 @@
                 <button type="button" v-on:click="app.hideSchedule()" class="button" v-if="showSchedule">Hide Schedule</button>
 				<button type="button"  v-on:click="app.getSchedule()" class="button" v-else>Show Schedule</button>
 				</span>
-				<div id="schedule" class="u-full-width" style="display: none">
-					<table>
+                <div id="schedule" class="u-full-width" style="display: none">
+					<table style="width:100%">
 						<tr>
 							<th>Monday</th>
 							<th>Tuesday</th>
@@ -79,7 +79,7 @@
                                 <td @click.stop="rowClicked(index)">{{ course.building }} {{ course.room }} </td>
                                 <td @click.stop="rowClicked(index)">{{ course.professors }}</td>
                                 <td @click.stop="rowClicked(index)">{{ course.times }}</td>
-                                <td @click.stop="rowClicked(index)">{{ course.capacity }}</td>
+                                <td @click.stop="rowClicked(index)">{{ app.getNumber(course.registered) }}/{{ course.capacity }}</td>
                                 <td v-if="profile.position === 'STUDENT' && checkProfile(course) === 'DROP'"><button @click="dropClass(course.crn)">Drop</button></td>
                                 <td v-else-if="profile.position === 'STUDENT' && checkProfile(course) === 'REG'"><button @click="registerClass(course.crn,course.capacity)">Register</button></td>
                                 <td v-else-if="profile.position === 'STUDENT' && checkProfile(course) === 'WAIT'"><button @click="dropClass(course.crn)">Drop (Waitlist)</button></td>

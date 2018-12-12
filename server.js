@@ -5,6 +5,8 @@ var url = require('url');
 var express = require('express');
 var bodyParser = require('body-parser');
 var app = express();
+var server = require('http').createServer(app);
+var io = require('socket.io')(server);
 
 // Set up POST processing
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -22,6 +24,7 @@ var db = new sqlite3.Database(path.join(__dirname, 'db', 'newMurphy.sqlite3'), (
 
 // Set up public directory
 app.use(express.static('public'));
+app.use(express.static(__dirname + '/node_modules'));
 
 // Set index.html default page
 app.get('/', function(req,res) {
@@ -151,6 +154,7 @@ app.post('/registerClass', function(req, res) {
 							 }
 							 else{
 								 res.end("done");
+                                 io.sockets.emit('register', 'data');
 							 }
 						 });
 						 db.run("UPDATE people SET registered_courses = ? WHERE university_id = ?;", registered_courses, username, function(err) {
@@ -306,6 +310,7 @@ app.post('/dropClass', function(req, res) {
 							 }
 							 else{
 								res.end("done");
+                                io.sockets.emit('drop', 'data');
 							 }
 						 });
 						 if(registered_courses === ""){
@@ -528,7 +533,16 @@ app.get('/classes', function(req, res) {
 	});  	
 });
 
+io.on('connection', function(client) {
+    console.log('Client connected...');
+
+    client.on('messages', function(data) {
+        client.emit('broad', data);
+        client.broadcast.emit('broad',data);
+    });
+});
+
 // Start Server
-app.listen(8005, function() {
+server.listen(8005, function() {
     console.log("Started on PORT 8005");
 });

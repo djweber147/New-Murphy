@@ -1,3 +1,21 @@
+// Socket code
+var socket = io.connect();
+
+socket.on('register', function(data) {
+    alert("user just register");
+});
+socket.on('drop', function(data) {
+    alert("user just dropped!!!1");
+});
+
+$('form').submit(function(e) {
+    e.preventDefault();
+    var message = $('#chat_input').val();
+    socket.emit('messages', message);
+});
+///
+
+// Vue app
 var app = new Vue({
     el: '#app',
     data: {
@@ -264,9 +282,6 @@ var app = new Vue({
 		this.getUser();
     }
 });
+
 function showLoading() { document.getElementById("loading").style.display = "block"; }
 function hideLoading() { document.getElementById("loading").style.display = "none"; }
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}

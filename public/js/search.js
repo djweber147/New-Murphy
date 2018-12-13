@@ -2,16 +2,21 @@
 var socket = io.connect();
 
 socket.on('register', function(data) {
-    alert("user just register");
-});
-socket.on('drop', function(data) {
-    alert("user just dropped!!!1");
+    for (var i=0; i < app.courses.length; i++) {
+        if (app.courses[i].crn == data.crn) {
+            app.courses[i].registered = data.registered_courses2;
+            break;
+        }
+    }
 });
 
-$('form').submit(function(e) {
-    e.preventDefault();
-    var message = $('#chat_input').val();
-    socket.emit('messages', message);
+socket.on('drop', function(data) {
+    for (var i=0; i < app.courses.length; i++) {
+        if (app.courses[i].crn == data.crn) {
+            app.courses[i].registered = data.registered_courses2;
+            break;
+        }
+    }
 });
 ///
 

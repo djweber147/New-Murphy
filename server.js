@@ -154,7 +154,7 @@ app.post('/registerClass', function(req, res) {
 							 }
 							 else{
 								 res.end("done");
-                                 io.sockets.emit('register', 'data');
+                                 io.sockets.emit('register', {crn, registered_courses2});
 							 }
 						 });
 						 db.run("UPDATE people SET registered_courses = ? WHERE university_id = ?;", registered_courses, username, function(err) {
@@ -310,7 +310,7 @@ app.post('/dropClass', function(req, res) {
 							 }
 							 else{
 								res.end("done");
-                                io.sockets.emit('drop', 'data');
+                                io.sockets.emit('drop', {crn, registered_courses2});
 							 }
 						 });
 						 if(registered_courses === ""){

@@ -14,6 +14,7 @@ socket.on('drop', function(data) {
     for (var i=0; i < app.courses.length; i++) {
         if (app.courses[i].crn == data.crn) {
             app.courses[i].registered = data.registered_courses2;
+	    app.getUser();
             break;
         }
     }

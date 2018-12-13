@@ -129,7 +129,7 @@ app.post('/registerClass', function(req, res) {
 							add = 1;
 						}
 						//console.log(list2.length,capacity);
-						if (list2.length > capacity+add){ // Add to Waitlist in course
+						if (list2.length > capacity){ // Add to Waitlist in course
 							registered_courses2 = row2.registered + ", W" + username;
 							if(registered_courses !== null){
 								registered_courses = row.registered_courses + ", W" + crn;

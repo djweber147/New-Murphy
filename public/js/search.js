@@ -5,6 +5,7 @@ socket.on('register', function(data) {
     for (var i=0; i < app.courses.length; i++) {
         if (app.courses[i].crn == data.crn) {
             app.courses[i].registered = data.registered_courses2;
+            window.alert("Course " + data.crn + " has been updated");
             break;
         }
     }
@@ -14,7 +15,8 @@ socket.on('drop', function(data) {
     for (var i=0; i < app.courses.length; i++) {
         if (app.courses[i].crn == data.crn) {
             app.courses[i].registered = data.registered_courses2;
-	    app.getUser();
+            app.getUser();
+            window.alert("Course " + data.crn + " has been updated");
             break;
         }
     }
@@ -233,6 +235,7 @@ var app = new Vue({
 			var req = "";
 			var obj = null;
             req = "roster?crn=" + crn;
+            showLoading();
             $.getJSON(req, function(data) {
                 obj = data;
 				var text = "";
@@ -253,6 +256,7 @@ var app = new Vue({
 				else{
 					$("#roster"+crn).html(text+text2);
 				}
+                hideLoading();
             });
 		},
 		hideClass: function(crn){

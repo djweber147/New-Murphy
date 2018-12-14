@@ -128,8 +128,14 @@ app.post('/registerClass', function(req, res) {
 						if(list2[0] === "--"){
 							add = 1;
 						}
-						//console.log(list2.length,capacity);
-						if (list2.length > capacity){ // Add to Waitlist in course
+						var temp = 0;
+						for(var i = 0; i<list2.length; i++){
+							if (list2[i] === ""){
+								temp++;
+							}
+						}
+						console.log(list2.length,capacity,registered_courses2);
+						if (list2.length-temp > capacity){ // Add to Waitlist in course
 							registered_courses2 = row2.registered + ", W" + username;
 							if(registered_courses !== null){
 								registered_courses = row.registered_courses + ", W" + crn;
@@ -147,7 +153,8 @@ app.post('/registerClass', function(req, res) {
 								registered_courses = crn;
 							}
 						}
-						//console.log(registered_courses,"nnnnnn2");
+						console.log(list2.length,capacity,registered_courses2);
+						console.log(registered_courses,"nnnnnn2");
 						db.run("UPDATE sections SET registered = ? WHERE crn = ?;", registered_courses2, crn, function(err) {
 							 if(err) {
 								console.log(err);
@@ -175,18 +182,18 @@ app.post('/dropClass', function(req, res) {
     var username = req.body.username;
     var crn = req.body.crn;
 	var registered_courses;
-    //console.log(crn);
+    
      // Could use more error checking along the way (values can't be '')
 	 if (isNaN(username)){
 		 res.end("err"); // Invalid field
 	 }
 	 else {
 		 db.all("SELECT registered_courses, university_id FROM people;",function(err,rows){
-			//console.log(rows);
+			
 			for(var i=0; i<rows.length;i++){
 				if (rows[i].university_id.toString() === username.toString()){
 					registered_courses = rows[i].registered_courses;
-					//console.log(registered_courses,"registered_courses");
+					
 					break;
 				}
 			}
@@ -196,12 +203,12 @@ app.post('/dropClass', function(req, res) {
 			else{
 				db.get("SELECT registered FROM sections WHERE crn = ?;",crn,function(err,row2){
 					registered_courses2 = row2.registered;
-					//console.log(registered_courses2,"G",registered_courses,"GERRRRR");
+					
 					if(err) {
 						console.log(err);
 					}
 					else{
-						//console.log(userList);
+						
 						(function(){
 						var userList = registered_courses.split(", ");
 						var userListFinal = "";
@@ -210,17 +217,17 @@ app.post('/dropClass', function(req, res) {
 						var x = true;
 						var editedRowId = "";
 						for(var i=0; i<list.length; i++){
-							//console.log(list[i],username);
+							
 							if(list[i].toString() === username.toString()){
 								// don't add
-								//console.log(list[i],username);
+								
 								for(var j=0; j<userList.length; j++){
-									//console.log(crn,userList[j],"HERE");
+									
 									if (crn.toString() === userList[j].toString())
 									{
 										userList[j] = ""; // DROPPING
 										list[i] = "";
-										//console.log(crn,userList[j],"HERE XXX");
+										
 									}
 									if (crn.toString() === userList[j].toString().substring(1))
 									{
@@ -232,14 +239,14 @@ app.post('/dropClass', function(req, res) {
 							}
 							else if(list[i].toString() === "W"+username.toString()){
 								// don't add
-								//console.log(list[i],username);
+								
 								for(var j=0; j<userList.length; j++){
-									//console.log(crn,userList[j],"HERE W");
+									
 									if (crn.toString() === userList[j].toString())
 									{
 										userList[j] = ""; // DROPPING
 										list[i] = "";
-										//console.log(crn,userList[j],"HERE WXXX");
+										
 									}
 									if (crn.toString() === userList[j].toString().substring(1))
 									{
@@ -250,15 +257,15 @@ app.post('/dropClass', function(req, res) {
 								x = false;
 							}
 							else if (list[i].toString().substring(0,1) === "W"){
-								//console.log(list[i].substring(1),"BOB");
+								
 								for(var k=0; k<rows.length;k++){
-									//console.log("BBBBBBB",rows[k].university_id.toString(),list[i].toString().substring(1));
+									
 									if (rows[k].university_id.toString() === list[i].toString().substring(1)){
 										editedRowId = rows[k].university_id;
 										var y = rows[k].registered_courses.split(", ");
 										rows[k].registered_courses = "";
 										for(var j=0; j<y.length; j++){
-											//console.log("YYYY",y[j],crn);
+											
 											if (y[j].toString().substring(1) === crn.toString()){
 												y[j] = crn;
 											}
@@ -285,17 +292,17 @@ app.post('/dropClass', function(req, res) {
 							}
 						}
 						
-						//console.log(userList,"Problem");
+						
 						for(var j=0; j<userList.length; j++){
-							//console.log(userList[j]);
+							
 							userListFinal += userList[j];
 							if(j !== userList.length-1){
 								userListFinal += ", ";
 							}
 						}
-						//console.log(userListFinal,"Final");
+						
 						for(var i=0; i<rows.length;i++){
-							//console.log(rows[i].university_id.toString(),username.toString());
+							
 							if (rows[i].university_id.toString() === username.toString()){
 								rows[i].registered_courses = userListFinal;
 								break;
@@ -303,7 +310,7 @@ app.post('/dropClass', function(req, res) {
 						}
 						
 						registered_courses2 = list2;
-						//console.log(crn,registered_courses2,"00000000000");
+						
 						db.run("UPDATE sections SET registered = ? WHERE crn = ?;", registered_courses2, crn, function(err) {
 							 if(err) {
 								console.log(err);
@@ -316,7 +323,7 @@ app.post('/dropClass', function(req, res) {
 						 if(registered_courses === ""){
 							registered_courses = null;
 						}
-						//console.log(username,registered_courses,"11111111111111");
+						
 						db.run("UPDATE people SET registered_courses = ? WHERE university_id = ?;", userListFinal, username, function(err) {
 							 if(err) {
 								console.log(err);
@@ -324,10 +331,10 @@ app.post('/dropClass', function(req, res) {
 						});
 						var temp = "";
 						for(var i=0; i<rows.length; i++){
-							//console.log(rows[i].university_id.toString(),editedRowId.toString());
+							
 							if (rows[i].university_id.toString() === editedRowId.toString()){
 								temp = rows[i].registered_courses;
-								//console.log("22222222222222",editedRowId,temp);
+								
 								db.run("UPDATE people SET registered_courses = ? WHERE university_id = ?;", temp, editedRowId, function(err) {
 									 if(err) {
 										console.log(err);

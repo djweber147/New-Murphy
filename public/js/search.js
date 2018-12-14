@@ -31,7 +31,7 @@ app = new Vue({
             var results = list.split(",");
             var count = 0;
                   for (var i=0; i < results.length; i++) {
-                  if (results[i].trim() !== "" && results[i].trim() !== "--") count++;
+                  if (results[i].trim() !== "" && results[i].trim() !== "--" && results[i].search('W')==-1) count++;
                   }
             return count;
         },

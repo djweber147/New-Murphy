@@ -2,50 +2,47 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>About - St. Thomas Course Search</title>
+        <title>St. Thomas Course Search</title>
         <link rel="stylesheet" href="css/login.css"/>
-        <link rel="stylesheet" href="css/search.css"/>
         <link rel="stylesheet" href="css/normalize.css"/>
         <link rel="stylesheet" href="css/skeleton.css"/>
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script type="text/javascript" src="js/login.js"></script>
     </head>
     <body>
-        <div class="row"><div class="row">
-            <div class="twelve columns">
+        <div class="row">
+            <div id="header" class="twelve columns">
                 <center><img src="img/murphy.jpg" alt="Welcome to Murphy Online!!"></center>
             </div>
         </div>
         <div class="row">
-            <div id="header" class="twelve columns">
-                <center><h2>About this Website</h2></center>
-            </div>
-        </div>
-        <div class="row">
             <div class="six columns offset-by-three">
-                <center><i><a href="/">Back to login</a></i></center>
-                <h5>About the project</h5>
-                <p>
-                This project was created in the following with the javascript frameworks <a href="https://jquery.com/">Jquery</a> and <a href="https://vuejs.org/">Vue</a> as well as CSS frameworks <a href="http://getskeleton.com/">Skeleton</a>. The website was served using <a href="https://nodejs.org/en/">NodeJs</a> and the <a href="https://expressjs.com/">Express</a> framework. The data for the courses and sections was scraped from the <a href="https://classes.aws.stthomas.edu/index.htm">St. Thomas class finder</a>
-                </p>
-                <h5>Demo video</h5>
-		<video width="320" height="240" controls>
-  		<source src="img/video.mp4" type="video/mp4">
-		Your browser does not support the video tag.
-		</video><br><br><br>
-
-                <h5>About us</h5>
-                <p><img src="img/weber.jpg" style="width:25%;float:left;padding-right:10px" /><h5>Douglas Weber</h5>My name is Douglas Weber. I am a senior in my final semester at St. Thomas. For the first two and a half years at St. Thomas, I was a memeber of St. John Vianney Seminary studying Philosophy and Catholic Studies. When I left the seminary, I decide to add a Computer Science major. I have loved studying this and will begin working at software consulting company in January. Some of my hobbies are bowling, playing guitar, and singing.
-                </p><br><br>
-		<p><img src="img/clements.jpg" style="width:25%;float:left;padding-right:10px">
-		<h5>Jared Clements</h5>
-		A little bit about me, I am the eldest child of 3. I am from Holmen Wisconsin. I am Senior at the University of Saint
-		Thomas studying Computer Science, Philosophy, and Catholic Studies. I am also a seminarian
-		studying at Saint John Vianney Seminary. My sister, Jenna, is studying at Saint Mary's University for
-		education. She is a Sophmore. My brother, Jacob, is a Senior in High School at Holmen High School
-		(my alma mater). He plans on doing someing in Computer Science as well. My parents, Brian and Sara Clements,
-		are taking care of my two younger cousins who now live with us as well.</p>
-            </div>
+                
+                <label id="fnamelabel" for="fname">FIRST NAME</label>
+                <input class="u-full-width" type="text" placeholder="John" id="fname">
+                    
+                <label id="lnamelabel" for="lname">LAST NAME</label>
+                <input class="u-full-width" type="text" placeholder="Doe" id="lname">
+                
+                <label for="username">USERNAME (University_ID)</label>
+                <input class="u-full-width" type="text" placeholder="e.g. 101010123" id="username">
+                    
+                <label for="password">PASSWORD</label>
+                <input class="u-full-width" type="password" placeholder="******" id="password">
+                    
+                <label id="positionlabel" for="position">POSITION</label>
+                <select class="u-full-width" id="position">
+                    <option value="STUDENT">STUDENT</option>
+                    <option value="FACULTY">FACULTY</option>
+                </select>
+                
+                <button type="button" id="submit" class="button-primary">Log In</button>
+                <button type="button" id="newuser" class="button">Create New User</button>
+                
+				<label id="errormessage" style="color: red" value=""></label>
+                
+                <hr />
+                <p><center><a href="about.html">About this website</a> | <a href="evaluation.html">Explination of the Project</a></center></p>            </div>
         </div>
     </body>
 </html>

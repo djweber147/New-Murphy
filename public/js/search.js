@@ -1,30 +1,5 @@
-// Socket code
-var socket = io.connect();
-
-socket.on('register', function(data) {
-    for (var i=0; i < app.courses.length; i++) {
-        if (app.courses[i].crn == data.crn) {
-            app.courses[i].registered = data.registered_courses2;
-            window.alert("Course " + data.crn + " has been updated");
-            break;
-        }
-    }
-});
-
-socket.on('drop', function(data) {
-    for (var i=0; i < app.courses.length; i++) {
-        if (app.courses[i].crn == data.crn) {
-            app.courses[i].registered = data.registered_courses2;
-            app.getUser();
-            window.alert("Course " + data.crn + " has been updated");
-            break;
-        }
-    }
-});
-///
-
 // Vue app
-var app = new Vue({
+app = new Vue({
     el: '#app',
     data: {
         clickedRow: -1,
@@ -40,7 +15,8 @@ var app = new Vue({
 		check: false,
 		currentSort: 'coursenumber',
         currentSortDir: 'asc',
-		view: false
+		view: false,
+        activity: []
     },
     methods: {
         rowClicked: function(index) {
@@ -295,3 +271,32 @@ var app = new Vue({
 
 function showLoading() { document.getElementById("loading").style.display = "block"; }
 function hideLoading() { document.getElementById("loading").style.display = "none"; }
+
+// Socket code
+var socket = io.connect();
+
+socket.on('register', function(data) {
+    for (var i=0; i < app.courses.length; i++) {
+        if (app.courses[i].crn == data.crn) {
+            app.courses[i].registered = data.registered_courses2;
+            app.activity.unshift(['add', data.crn]);
+            break;
+        }
+    }
+});
+
+socket.on('drop', function(data) {
+    for (var i=0; i < app.courses.length; i++) {
+        if (app.courses[i].crn == data.crn) {
+            app.courses[i].registered = data.registered_courses2;
+            app.getUser();
+            // Check if user is on waitlist
+          // if (???) {
+          //   app.activity.unshift(['wait', data.crn]);
+          //}
+            app.activity.unshift(['drop', data.crn]);
+            break;
+        }
+    }
+});
+///

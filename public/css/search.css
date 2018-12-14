@@ -1,3 +1,12 @@
+html {
+    overflow: hidden;
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    overflow: auto;
+}
 #header{
     background-color: #dcdcdc;
     color: #b91be5;
@@ -42,4 +51,29 @@ td button {
 }
 #classlist {
     width: 100%;
+}
+#app {
+    padding-bottom: 10%;
+}
+#activitylabel {
+    position: fixed;
+    width: 100%;
+    height: 30px;
+    overflow-y: hidden;
+    background-color: #b91be5;
+    border-top: 1px solid black;
+    bottom: 8%;
+    padding: 3px;
+}
+#activity {
+    position: fixed;
+    width: 100%;
+    height: 8%;
+    overflow-y: auto;
+    background-color: #dcdcdc;
+    bottom: 0px;
+    padding: 3px
+}
+#activitylist {
+    list-style: none;
 }

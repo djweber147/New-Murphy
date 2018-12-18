@@ -26,7 +26,7 @@ th {
     cursor: pointer;
 }
 #loading {
-    z-index: 2;
+    z-index: 5;
     position: fixed;
     width: 100%;
     height: 100%;
@@ -63,16 +63,27 @@ td button {
     background-color: #b91be5;
     border-top: 1px solid black;
     bottom: 8%;
-    padding: 3px;
+    padding-left: 5px;
+    cursor: pointer;
+    transition: bottom 0.2s ease-in;
+    z-index: 4;
+}
+#activitylabel a {
+    color: black;
 }
 #activity {
     position: fixed;
     width: 100%;
     height: 8%;
-    overflow-y: auto;
+    max-height: 8%;
     background-color: #dcdcdc;
     bottom: 0px;
-    padding: 3px
+    padding: 0px;
+    padding-left: 5px;
+    z-index: 3;
+   
+    overflow-y: auto;
+    transition: max-height 0.2s ease-in;
 }
 #activitylist {
     list-style: none;

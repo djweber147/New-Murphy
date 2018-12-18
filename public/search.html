@@ -84,6 +84,7 @@
                                 <td @click.stop="rowClicked(index)">{{ course.times }}</td>
                                 <td @click.stop="rowClicked(index)">{{ app.getNumber(course.registered) }}/{{ course.capacity }}</td>
                                 <td v-if="profile.position === 'STUDENT' && checkProfile(course) === 'DROP'"><button @click="dropClass(course.crn)">Drop</button></td>
+                                <td v-else-if="profile.position === 'STUDENT' && checkProfile(course) === 'REG' && app.getNumber(course.registered)>=course.capacity"><button @click="registerClass(course.crn,course.capacity)">Waitlist</button></td>
                                 <td v-else-if="profile.position === 'STUDENT' && checkProfile(course) === 'REG'"><button @click="registerClass(course.crn,course.capacity)">Register</button></td>
                                 <td v-else-if="profile.position === 'STUDENT' && checkProfile(course) === 'WAIT'"><button @click="dropClass(course.crn)">Drop (Waitlist)</button></td>
                                 <td v-else-if="profile.position === 'STUDENT' && checkProfile(course) === 'TIME'" style="color: red">Time Conflict</td>
@@ -104,10 +105,14 @@
                     </tbody>
                 </table>
             </div>
-            <div id="activitylabel">
-                Course Activity (<b>bold</b> = my waitlisted course)
+            <div id="activitylabel" onclick="toggleActivity()">
+                <p style="text-align:left;">
+                All Course Activity (<b>bold</b> = my waitlisted course)
+                <span style="float:right;padding-right:10px">{{ profile.first_name }} {{ profile.last_name }} - {{ profile.university_id }} | <a href="#" onclick="logout()">Logout</a></span>
+                </p>
             </div>
             <div id="activity">
+                <span v-if="activity.length==0"><i>No activity since login</i></span>
                 <ul id="activitylist">
                     <li v-for="item in activity" style="margin: 1px 0;">
                         <span v-if="item[0]=='add'">Added: <a href="#" v-on:click="req_crn=item[1];getCourses()"> {{ item[1] }}</a></span>

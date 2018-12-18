@@ -99,7 +99,7 @@ app = new Vue({
 					return "DROP"; // You are registered
 				}
 				if (app.classObjects[i] !== undefined){
-					if (app.classObjects[i].times === x.times){ // Time Conflict
+					if (app.classObjects[i].times === x.times && x.times != "See Instructor"){ // Time Conflict
 						$("#"+x.crn).css("background-color",color4);
 						return "TIME"; // You are waitlisted
 					}
@@ -269,8 +269,24 @@ app = new Vue({
     }
 });
 
+function logout() {
+    localStorage.clear();
+    window.location.replace("/");
+}
+
 function showLoading() { document.getElementById("loading").style.display = "block"; }
 function hideLoading() { document.getElementById("loading").style.display = "none"; }
+
+function toggleActivity() {
+    if (document.getElementById("activity").style.maxHeight == "0%"){
+        document.getElementById("activity").style.maxHeight = "8%";
+        document.getElementById("activitylabel").style.bottom = "8%";
+    }
+    else {
+        document.getElementById("activity").style.maxHeight = "0%";
+        document.getElementById("activitylabel").style.bottom = "0%";
+    }
+}
 
 // Socket code
 var socket = io.connect();
@@ -288,13 +304,19 @@ socket.on('register', function(data) {
 socket.on('drop', function(data) {
     for (var i=0; i < app.courses.length; i++) {
         if (app.courses[i].crn == data.crn) {
+          
+            // Check if dropped course was on user's waitlist and is not anymore
+            if (app.courses[i].registered.includes('W' + localStorage.getItem("user")) && !data.registered_courses2.includes('W' + localStorage.getItem("user"))) {
+                alert("Course " + data.crn + ", which you are waitlisted for, has been dropped, and you have been successfully registered for it!");
+                app.activity.unshift(['wait', data.crn]);
+            }
+            else {
+                app.activity.unshift(['drop', data.crn]);
+            }
+          
             app.courses[i].registered = data.registered_courses2;
             app.getUser();
-            // Check if user is on waitlist
-          // if (???) {
-          //   app.activity.unshift(['wait', data.crn]);
-          //}
-            app.activity.unshift(['drop', data.crn]);
+
             break;
         }
     }

@@ -306,7 +306,7 @@ socket.on('drop', function(data) {
         if (app.courses[i].crn == data.crn) {
           
             // Check if dropped course was on user's waitlist and is not anymore
-            if (app.courses[i].registered.includes('W' + localStorage.getItem("user")) && !data.registered_courses2.includes('W' + localStorage.getItem("user"))) {
+            if (app.courses[i].registered.includes('W' + localStorage.getItem("user")) && !data.registered_courses2.includes('W' + localStorage.getItem("user")) && data.registered_course2.includes(localStorage.getItem("user"))) {
                 alert("Course " + data.crn + ", which you are waitlisted for, has been dropped, and you have been successfully registered for it!");
                 app.activity.unshift(['wait', data.crn]);
             }
